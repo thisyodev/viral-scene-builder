@@ -489,7 +489,24 @@ PAYOFF: แต่เพราะคุณคิดแบบนี้"></textarea
       </div>
 
       <div id="vg-content" style="display:none">
-        <div id="vg-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;"></div>
+        <div id="vg-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;"></div>
+
+        <!-- Manual Poll existing task -->
+        <div style="background:var(--bg2);border:1px solid rgba(255,176,32,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;">
+          <div style="font-size:10px;color:var(--amber);font-weight:600;margin-bottom:7px;">🔍 Poll Task ID ที่มีอยู่แล้ว (ป้องกัน submit ซ้ำ)</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="manual-task-inp" placeholder="วาง taskId จาก kie.ai/logs เช่น 77ca7c0c..."
+              style="flex:1;min-width:200px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;">
+            <select id="manual-scene-sel"
+              style="padding:7px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;flex-shrink:0;">
+              <option value="0">Scene 1</option>
+              <option value="1">Scene 2</option>
+              <option value="2">Scene 3</option>
+            </select>
+            <button onclick="pollExistingTask()" style="padding:7px 12px;background:var(--adim);border:1px solid rgba(33,217,122,.3);border-radius:var(--r);color:var(--acc);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">Poll →</button>
+          </div>
+          <div style="margin-top:6px;font-size:10px;color:var(--t3);">Task IDs จาก log: 77ca7c0c · 101d1343 · 7159a5bb · 195663f9</div>
+        </div>
         <!-- Kling API Key -->
         <div style="background:var(--bg2);border:1.5px solid rgba(255,176,32,.35);border-radius:var(--rl);padding:14px 16px;margin-bottom:14px;">
           <div style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">🔑 Kling API Key</div>
@@ -1340,7 +1357,7 @@ async function klingSubmit(prompt, refImgUrl){
     throw new Error(`Worker error ${res.status}: ${data?.error || data?.message || JSON.stringify(data).slice(0,100)}`);
   }
 
-  const taskId = data?.data?.task_id || data?.task_id || data?.id;
+  const taskId = data?.data?.taskId || data?.data?.task_id || data?.taskId || data?.task_id || data?.id;
   if(!taskId){
     throw new Error(`ไม่ได้รับ task_id — kie.ai ตอบ: ${JSON.stringify(data).slice(0,150)}`);
   }
@@ -1352,32 +1369,90 @@ async function klingPoll(taskId, onProgress){
   const MAX = 120;
   for(let attempt=0; attempt<MAX; attempt++){
     await new Promise(r=>setTimeout(r,5000));
-    const res = await fetch(`${workerUrl}/status/${taskId}`);
-    if(!res.ok) continue;
-    const data = await res.json();
+    let data;
+    try{
+      const res = await fetch(`${workerUrl}/status/${taskId}`);
+      data = await res.json();
+    }catch(e){ continue; }
+
+    // kie.ai response: { code, msg, data: { taskStatus, works: [{resource}] } }
     const task = data?.data || data;
-    const status = task?.task_status || task?.status || '';
+    const status = (
+      task?.taskStatus ||
+      task?.task_status ||
+      task?.status || ''
+    ).toLowerCase();
+
     const pct = Math.min(95, Math.round(((attempt+1)/MAX)*100));
     onProgress(pct, status);
-    if(status === 'succeed' || status === 'completed'){
-      const videos = task?.task_result?.videos || task?.videos || [];
-      const url = videos[0]?.url || videos[0]?.video_url || '';
+    vgAddLog(`Scene poll: ${status} (${pct}%)`);
+
+    if(status === 'succeed' || status === 'succeeded' || status === 'completed'){
+      // kie.ai stores video in works array
+      const works = task?.works || task?.task_result?.videos || task?.videos || [];
+      const url = works[0]?.resource || works[0]?.url || works[0]?.video_url || '';
       if(url) return url;
-      throw new Error('Task สำเร็จแต่ไม่มี video URL');
+      // log full response for debugging
+      vgAddLog(`task data: ${JSON.stringify(task).slice(0,200)}`);
+      throw new Error('Task สำเร็จแต่ไม่พบ video URL — ดู log');
     }
     if(status === 'failed' || status === 'error'){
-      throw new Error(`Task failed: ${task?.task_status_msg || 'unknown'}`);
+      throw new Error(`Task failed: ${task?.failReason || task?.task_status_msg || JSON.stringify(task).slice(0,100)}`);
     }
   }
   throw new Error('Timeout — เกิน 10 นาที ลอง generate ใหม่');
 }
 
-// video URLs เก็บไว้แสดงใน phone
+// video URLs และ task IDs เก็บไว้ป้องกัน submit ซ้ำ
 const vgVideos = {};
+const vgTaskIds = {}; // scene index → taskId ที่ submit ไปแล้ว
 
 async function vgGenOne(i){
   if(vgStates[i]==='generating') return;
   if(vgStates[i]==='done' && vgVideos[i]){ vgShowPhone(i); return; }
+
+  // ถ้ามี taskId อยู่แล้ว = submit ไปแล้ว ให้ poll ต่อเลยไม่ submit ใหม่
+  if(vgTaskIds[i]){
+    vgAddLog(`Scene ${i+1}: ใช้ task เดิม ${vgTaskIds[i].slice(0,12)}... (ไม่ submit ซ้ำ)`,true);
+    vgStates[i]='generating';
+    vgUpdateRow(i);
+    if(vgDisplay===i||vgDisplay===-1) vgShowPhone(i);
+    vgUpdateStats();
+    const s=scenes[i];
+    const updateRing=(p,msg)=>{
+      const prog=document.getElementById(`vg-prog${i}`);
+      if(prog) prog.style.width=p+'%';
+      if(vgDisplay===i){
+        const ring=document.getElementById('vg-ring');
+        if(ring) ring.style.strokeDashoffset=138-(138*(p/100));
+        const rp=document.getElementById('vg-ring-pct');
+        if(rp) rp.textContent=p+'%';
+        const pb=document.getElementById('vg-pb-fill');
+        if(pb) pb.style.width=p+'%';
+        const step=document.getElementById('vg-gen-step');
+        if(step) step.textContent=msg||'กำลัง poll...';
+      }
+    };
+    try{
+      const videoUrl=await klingPoll(vgTaskIds[i],(pct,status)=>{
+        updateRing(10+Math.round(pct*0.85),`${status}...`);
+        vgAddLog(`Scene ${s.scene_num}: ${status} ${pct}%`);
+      });
+      vgVideos[i]=videoUrl;
+      updateRing(100,'เสร็จแล้ว!');
+      vgStates[i]='done';
+      vgUpdateRow(i);
+      if(vgDisplay===i) vgShowPhone(i);
+      vgUpdateStats();
+      vgAddLog(`Scene ${s.scene_num}: ✓ Done`,true);
+    }catch(err){
+      vgStates[i]='pending';
+      vgUpdateRow(i);
+      vgUpdateStats();
+      vgAddLog(`Scene ${s.scene_num}: ❌ ${err.message}`);
+    }
+    return;
+  }
 
   vgStates[i]='generating';
   vgUpdateRow(i);
@@ -1406,6 +1481,7 @@ async function vgGenOne(i){
     updateRing(5,'ส่ง prompt ไป Kling...');
     const refUrl = refImgB64 ? `data:image/jpeg;base64,${refImgB64}` : null;
     const taskId = await klingSubmit(s.video_prompt, refUrl);
+    vgTaskIds[i] = taskId; // บันทึกไว้ป้องกัน submit ซ้ำ
     vgAddLog(`Scene ${s.scene_num}: task_id=${taskId} — กำลัง poll...`);
     updateRing(10,'Kling รับ task แล้ว รอ queue...');
 
@@ -1446,6 +1522,17 @@ async function vgGenerateAll(){
   }
   document.getElementById('vg-gen-all-btn').disabled=false;
   vgAddLog('═══ ทุก scene พร้อมแล้ว — copy prompts แล้วนำไป render ใน Kling/Veo ════',true);
+}
+
+async function pollExistingTask(){
+  const taskId = document.getElementById('manual-task-inp')?.value?.trim();
+  const sceneIdx = parseInt(document.getElementById('manual-scene-sel')?.value||'0');
+  if(!taskId){ vgAddLog('❌ ใส่ taskId ก่อน'); return; }
+  if(!scenes[sceneIdx]){ vgAddLog('❌ ยังไม่มี scenes — analyze ก่อน'); return; }
+
+  vgTaskIds[sceneIdx] = taskId;
+  vgAddLog(`Manual poll: Scene ${sceneIdx+1} → taskId ${taskId.slice(0,12)}...`, true);
+  await vgGenOne(sceneIdx);
 }
 
 function vgReset(){
