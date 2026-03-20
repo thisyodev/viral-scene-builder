@@ -247,7 +247,14 @@ textarea.inp{min-height:130px;resize:vertical;line-height:1.75;}
   <button class="nav-i">📦 Export</button>
   <div class="sb-bottom">
     <div class="s-row">
-      <div class="s-lbl">Total duration <b style="color:var(--acc)">30s</b></div>
+      <div class="s-lbl" style="color:var(--acc);margin-bottom:5px;">🤖 Claude API Key</div>
+      <div style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:6px 8px;">
+        <div id="claude-dot" style="width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;"></div>
+        <input id="claude-key-inp" type="password" placeholder="sk-ant-..." style="flex:1;background:transparent;border:none;color:var(--txt);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;" oninput="checkClaudeKey()">
+        <button onclick="toggleClaudeVis()" id="claude-vis-btn" style="padding:1px 6px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--t3);font-size:10px;cursor:pointer;flex-shrink:0;">show</button>
+      </div>
+      <div style="font-size:9px;color:var(--t3);margin-top:4px;">console.anthropic.com/keys</div>
+    </div>
       <div style="display:flex;gap:5px;margin-top:4px;">
         <div style="flex:1;text-align:center;padding:5px 4px;background:var(--adim);border:1px solid rgba(33,217,122,.25);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">TikTok</div>
         <div style="flex:1;text-align:center;padding:5px 4px;background:var(--adim);border:1px solid rgba(33,217,122,.25);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">Reels</div>
@@ -623,6 +630,27 @@ function clearRefImg(){
   document.getElementById('ref-clear').style.display='none';
 }
 
+function getClaudeKey(){
+  try{
+    const k=document.getElementById('claude-key-inp')?.value?.trim();
+    if(k) return k;
+    return localStorage.getItem('claude_key')||'';
+  }catch(e){return '';}
+}
+function checkClaudeKey(){
+  const k=document.getElementById('claude-key-inp')?.value?.trim()||'';
+  const dot=document.getElementById('claude-dot');
+  if(dot) dot.style.background=k.startsWith('sk-ant-')?'#21d97a':k.length>10?'#ffb020':'var(--t3)';
+  try{if(k) localStorage.setItem('claude_key',k);}catch(e){}
+}
+function toggleClaudeVis(){
+  const inp=document.getElementById('claude-key-inp');
+  const btn=document.getElementById('claude-vis-btn');
+  if(!inp) return;
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'show':'hide';
+}
+
 // ─── ANALYZE ───────────────────────────────────────────────────
 async function analyze(){
   hideErr();
@@ -687,13 +715,17 @@ Additional rules:
       : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
 
   try{
+    const claudeKey = getClaudeKey();
+    const headers = {
+      'Content-Type':'application/json',
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    };
+    if(claudeKey) headers['x-api-key'] = claudeKey;
+
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
+      headers,
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:userContent}]})
     });
     if(!res.ok){
@@ -1217,10 +1249,13 @@ window.addEventListener('DOMContentLoaded',()=>{
   try{
     const url=localStorage.getItem('kie_worker_url');
     const key=localStorage.getItem('kie_key');
+    const claudeKey=localStorage.getItem('claude_key');
     const urlInp=document.getElementById('worker-url-inp');
     const keyInp=document.getElementById('kling-key-inp');
+    const claudeInp=document.getElementById('claude-key-inp');
     if(url&&urlInp) urlInp.value=url;
     if(key&&keyInp){ keyInp.value=key; checkKlingKey(); }
+    if(claudeKey&&claudeInp){ claudeInp.value=claudeKey; checkClaudeKey(); }
   }catch(e){}
 });
 
