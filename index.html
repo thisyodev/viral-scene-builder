@@ -1,1891 +1,758 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>🎬 Viral Scene Builder</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
-    rel="stylesheet">
-  <style>
-    :root {
-      --bg: #08090c;
-      --bg2: #0e1118;
-      --bg3: #141922;
-      --bg4: #1a2030;
-      --bg5: #202840;
-      --border: rgba(255, 255, 255, 0.06);
-      --border2: rgba(255, 255, 255, 0.12);
-      --acc: #21d97a;
-      --acc2: #17b864;
-      --adim: rgba(33, 217, 122, 0.10);
-      --aglow: rgba(33, 217, 122, 0.20);
-      --txt: #edf0f6;
-      --t2: #7d8899;
-      --t3: #3d4557;
-      --red: #ff4f4f;
-      --amber: #ffb020;
-      --blue: #4b9eff;
-      --purple: #a78bfa;
-      --r: 10px;
-      --rl: 14px;
-      --sidebar: 228px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      height: 100%;
-      background: var(--bg);
-    }
-
-    body {
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--txt);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── SHELL ── */
-    .shell {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* ── SIDEBAR desktop ── */
-    .sidebar {
-      width: var(--sidebar);
-      min-width: var(--sidebar);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 16px 11px;
-      gap: 3px;
-      overflow-y: auto;
-      transition: transform .28s cubic-bezier(.4, 0, .2, 1);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 3px 5px 15px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 5px;
-    }
-
-    .brand-ico {
-      width: 33px;
-      height: 33px;
-      background: var(--acc);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .brand-name {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 13px;
-      line-height: 1.2;
-    }
-
-    .brand-sub {
-      font-size: 10px;
-      color: var(--t3);
-    }
-
-    .nav-grp {
-      font-size: 9.5px;
-      font-weight: 600;
-      color: var(--t3);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: 10px 6px 3px;
-    }
-
-    .nav-i {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 9px;
-      border-radius: var(--r);
-      border: 1px solid transparent;
-      color: var(--t2);
-      font-size: 12.5px;
-      cursor: pointer;
-      transition: all .13s;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-    }
-
-    .nav-i:hover {
-      background: var(--bg3);
-      color: var(--txt);
-    }
-
-    .nav-i.active {
-      background: var(--adim);
-      color: var(--acc);
-      border-color: rgba(33, 217, 122, .16);
-    }
-
-    .sb-bottom {
-      margin-top: auto;
-      padding-top: 13px;
-      border-top: 1px solid var(--border);
-    }
-
-    .s-row {
-      margin-bottom: 9px;
-    }
-
-    .s-lbl {
-      font-size: 10px;
-      color: var(--t3);
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .s-lbl b {
-      color: var(--acc);
-      font-weight: 600;
-    }
-
-    input[type=range] {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 3px;
-      border-radius: 2px;
-      background: var(--bg4);
-      outline: none;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--acc);
-      cursor: pointer;
-    }
-
-    select.msel {
-      width: 100%;
-      padding: 6px 9px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      color: var(--txt);
-      font-size: 12px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      appearance: none;
-    }
-
-    select.msel:focus {
-      border-color: var(--acc);
-    }
-
-    /* ── MOBILE HEADER ── */
-    .mob-header {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .mob-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .mob-brand-ico {
-      width: 28px;
-      height: 28px;
-      background: var(--acc);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-
-    .hamburger {
-      width: 36px;
-      height: 36px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-direction: column;
-      gap: 4px;
-      padding: 10px 8px;
-    }
-
-    .hamburger span {
-      display: block;
-      width: 18px;
-      height: 2px;
-      background: var(--t2);
-      border-radius: 2px;
-      transition: all .2s;
-    }
-
-    /* DRAWER overlay */
-    .drawer-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .6);
-      z-index: 200;
-      backdrop-filter: blur(2px);
-    }
-
-    .drawer-overlay.open {
-      display: block;
-    }
-
-    .sidebar.drawer {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      z-index: 201;
-      transform: translateX(-100%);
-      box-shadow: 4px 0 24px rgba(0, 0, 0, .5);
-    }
-
-    .sidebar.drawer.open {
-      transform: translateX(0);
-    }
-
-    /* ── MAIN ── */
-    .main {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .main-inner {
-      padding: 28px 32px;
-      flex: 1;
-    }
-
-    /* ── PAGE HEAD ── */
-    .pg-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 24px;
-      letter-spacing: -.4px;
-      margin-bottom: 3px;
-    }
-
-    .pg-meta {
-      font-size: 12px;
-      color: var(--t3);
-      margin-bottom: 22px;
-    }
-
-    .pg-meta b {
-      color: var(--t2);
-      font-weight: 500;
-    }
-
-    /* ── TOP NAV TABS ── */
-    .top-tabs {
-      display: flex;
-      gap: 2px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 3px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .top-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .ttab {
-      padding: 6px 14px;
-      border-radius: 8px;
-      border: none;
-      background: transparent;
-      color: var(--t2);
-      font-size: 12.5px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: all .13s;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .ttab.active {
-      background: var(--acc);
-      color: #000;
-      font-weight: 600;
-    }
-
-    /* ── EXAMPLES ── */
-    .ex-label {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--t3);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .ex-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .ex-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 7px;
-      margin-bottom: 18px;
-    }
-
-    .ex-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: all .14s;
-      text-align: left;
-      width: 100%;
-    }
-
-    .ex-card:hover,
-    .ex-card:active {
-      border-color: var(--acc);
-      background: var(--adim);
-    }
-
-    .ex-tag {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 20px;
-      margin-bottom: 6px;
-      display: inline-block;
-    }
-
-    .tg-f {
-      background: rgba(255, 176, 32, .14);
-      color: var(--amber);
-    }
-
-    .tg-d {
-      background: rgba(255, 79, 79, .14);
-      color: var(--red);
-    }
-
-    .tg-m {
-      background: rgba(75, 158, 255, .14);
-      color: var(--blue);
-    }
-
-    .tg-l {
-      background: rgba(33, 217, 122, .14);
-      color: var(--acc);
-    }
-
-    .tg-s {
-      background: rgba(244, 114, 182, .14);
-      color: var(--pink);
-    }
-
-    .ex-ttl {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--txt);
-      margin-bottom: 2px;
-      line-height: 1.35;
-    }
-
-    .ex-hook {
-      font-size: 11px;
-      color: var(--t2);
-      line-height: 1.4;
-    }
-
-    /* ── INPUT ── */
-    .icard {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--rl);
-      padding: 16px 18px;
-      margin-bottom: 12px;
-    }
-
-    .f-lbl {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--t2);
-      margin-bottom: 7px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-
-    .inp {
-      width: 100%;
-      padding: 10px 13px;
-      background: var(--bg3);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r);
-      color: var(--txt);
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      transition: border-color .13s;
-    }
-
-    .inp:focus {
-      border-color: var(--acc);
-      box-shadow: 0 0 0 3px var(--adim);
-    }
-
-    .inp::placeholder {
-      color: var(--t3);
-    }
-
-    textarea.inp {
-      min-height: 130px;
-      resize: vertical;
-      line-height: 1.75;
-    }
-
-    .or-line {
-      text-align: center;
-      font-size: 11px;
-      color: var(--t3);
-      margin: 10px 0;
-    }
-
-    .dropzone {
-      border: 1.5px dashed var(--border2);
-      border-radius: var(--r);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: border-color .13s;
-    }
-
-    .dropzone:hover,
-    .dropzone:active {
-      border-color: var(--acc);
-    }
-
-    .dz-t {
-      flex: 1;
-      font-size: 12.5px;
-      color: var(--t2);
-    }
-
-    .dz-h {
-      font-size: 11px;
-      color: var(--t3);
-      margin-top: 2px;
-    }
-
-    .browse-btn {
-      padding: 6px 12px;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      border-radius: var(--r);
-      color: var(--t2);
-      font-size: 11.5px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .browse-btn:hover {
-      border-color: var(--acc);
-      color: var(--acc);
-    }
-
-    /* ── ANALYZE BTN ── */
-    .analyze-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--acc);
-      color: #000;
-      border: none;
-      border-radius: var(--r);
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all .14s;
-      margin-bottom: 16px;
-      letter-spacing: .01em;
-    }
-
-    .analyze-btn:hover {
-      background: var(--acc2);
-      box-shadow: 0 6px 24px var(--aglow);
-      transform: translateY(-1px);
-    }
-
-    .analyze-btn:active {
-      transform: none;
-      box-shadow: none;
-    }
-
-    .analyze-btn:disabled {
-      background: var(--bg4);
-      color: var(--t3);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    /* ── ERROR ── */
-    .err-box {
-      background: rgba(255, 79, 79, .08);
-      border: 1px solid rgba(255, 79, 79, .22);
-      border-radius: var(--r);
-      padding: 11px 15px;
-      font-size: 13px;
-      color: var(--red);
-      margin-bottom: 12px;
-      display: none;
-    }
-
-    /* ── LOADING ── */
-    .loading {
-      text-align: center;
-      padding: 48px 0;
-      display: none;
-    }
-
-    .spinner {
-      width: 34px;
-      height: 34px;
-      border: 2.5px solid var(--bg4);
-      border-top-color: var(--acc);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      margin: 0 auto 12px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .load-msg {
-      font-size: 12.5px;
-      color: var(--t3);
-    }
-
-    /* ── DL ROW ── */
-    .dl-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-
-    .dl-btn {
-      flex: 1;
-      min-width: 140px;
-      padding: 9px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      color: var(--t2);
-      font-size: 12px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      text-align: center;
-      transition: all .13s;
-    }
-
-    .dl-btn:hover,
-    .dl-btn:active {
-      border-color: var(--acc);
-      color: var(--acc);
-      background: var(--adim);
-    }
-
-    /* ── SCENE CARDS ── */
-    .sc-head {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 15px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .sc-badge {
-      background: var(--adim);
-      color: var(--acc);
-      font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      padding: 2px 9px;
-      border-radius: 20px;
-      border: 1px solid rgba(33, 217, 122, .16);
-    }
-
-    .sc-card {
-      border: 1px solid var(--border);
-      border-radius: var(--rl);
-      margin-bottom: 7px;
-      overflow: hidden;
-      transition: border-color .13s;
-    }
-
-    .sc-card.open {
-      border-color: rgba(33, 217, 122, .22);
-    }
-
-    .sc-hdr {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 12px 15px;
-      cursor: pointer;
-      background: var(--bg2);
-      user-select: none;
-    }
-
-    .sc-num {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 10px;
-      color: var(--acc);
-      min-width: 52px;
-      letter-spacing: .05em;
-    }
-
-    .sc-ttl {
-      font-size: 13px;
-      color: var(--txt);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .chev {
-      color: var(--t3);
-      font-size: 11px;
-      transition: transform .18s;
-      flex-shrink: 0;
-    }
-
-    .chev.open {
-      transform: rotate(90deg);
-      color: var(--acc);
-    }
-
-    .sc-body {
-      display: none;
-      background: var(--bg3);
-      border-top: 1px solid var(--border);
-      padding: 14px 16px;
-    }
-
-    .sc-body.open {
-      display: block;
-      animation: fd .18s ease;
-    }
-
-    @keyframes fd {
-      from {
-        opacity: 0;
-        transform: translateY(-3px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    .pb {
-      margin-bottom: 12px;
-    }
-
-    .pb:last-child {
-      margin-bottom: 0;
-    }
-
-    .pt {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--t3);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .cp-btn {
-      padding: 3px 9px;
-      background: transparent;
-      border: 1px solid var(--border2);
-      border-radius: 5px;
-      color: var(--t3);
-      font-size: 10.5px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: all .12s;
-    }
-
-    .cp-btn:hover,
-    .cp-btn.copied {
-      border-color: var(--acc);
-      color: var(--acc);
-    }
-
-    .beat-txt {
-      font-size: 13px;
-      color: var(--txt);
-      background: var(--bg2);
-      border-left: 3px solid var(--acc);
-      border-radius: 0 var(--r) var(--r) 0;
-      padding: 9px 12px;
-      line-height: 1.65;
-      font-style: italic;
-    }
-
-    .pr-txt {
-      font-size: 12.5px;
-      color: var(--t2);
-      background: var(--bg4);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 10px 12px;
-      line-height: 1.65;
-    }
-
-    /* ── GEN BTN per scene ── */
-    .gen-btn {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      background: var(--bg4);
-      border: 1px solid var(--border2);
-      border-radius: var(--r);
-      color: var(--t2);
-      font-size: 12.5px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: all .13s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .gen-btn:hover {
-      background: var(--adim);
-      border-color: var(--acc);
-      color: var(--acc);
-    }
-
-    .gen-btn:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    .gen-btn.generating {
-      border-color: var(--amber);
-      color: var(--amber);
-    }
-
-    .gen-btn.done {
-      border-color: var(--acc);
-      color: var(--acc);
-      background: var(--adim);
-    }
-
-    /* ── VIDEO PREVIEW CARD ── */
-    .vid-preview {
-      margin-top: 10px;
-      background: var(--bg4);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      display: none;
-    }
-
-    .vid-preview.show {
-      display: block;
-      animation: fd .2s ease;
-    }
-
-    .vid-thumb {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: linear-gradient(135deg, var(--bg3), var(--bg5));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .vid-thumb-bars {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: flex-end;
-      padding: 12px;
-      gap: 2px;
-      opacity: .3;
-    }
-
-    .bar {
-      flex: 1;
-      background: var(--acc);
-      border-radius: 2px 2px 0 0;
-      animation: barAnim 1.2s ease-in-out infinite;
-    }
-
-    .bar:nth-child(2) {
-      animation-delay: .1s;
-    }
-
-    .bar:nth-child(3) {
-      animation-delay: .2s;
-    }
-
-    .bar:nth-child(4) {
-      animation-delay: .15s;
-    }
-
-    .bar:nth-child(5) {
-      animation-delay: .05s;
-    }
-
-    .bar:nth-child(6) {
-      animation-delay: .25s;
-    }
-
-    .bar:nth-child(7) {
-      animation-delay: .1s;
-    }
-
-    .bar:nth-child(8) {
-      animation-delay: .2s;
-    }
-
-    @keyframes barAnim {
-
-      0%,
-      100% {
-        height: 20%;
-      }
-
-      50% {
-        height: 80%;
-      }
-    }
-
-    .vid-play-ico {
-      width: 48px;
-      height: 48px;
-      background: rgba(33, 217, 122, .15);
-      border: 2px solid var(--acc);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .vid-play-ico::after {
-      content: '▶';
-      font-size: 16px;
-      color: var(--acc);
-      margin-left: 3px;
-    }
-
-    .vid-label {
-      font-size: 11px;
-      color: var(--t2);
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 0 16px;
-    }
-
-    .vid-meta {
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .vid-meta-l {
-      font-size: 12px;
-      color: var(--t2);
-    }
-
-    .vid-meta-r {
-      display: flex;
-      gap: 6px;
-    }
-
-    .vid-action {
-      padding: 5px 10px;
-      background: transparent;
-      border: 1px solid var(--border2);
-      border-radius: 6px;
-      color: var(--t2);
-      font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: all .12s;
-    }
-
-    .vid-action:hover {
-      border-color: var(--acc);
-      color: var(--acc);
-    }
-
-    /* ── VIDEO GEN TAB ── */
-    .vidgen-wrap {
-      display: none;
-    }
-
-    .vidgen-wrap.active {
-      display: block;
-    }
-
-    .vg-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .vg-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--rl);
-      overflow: hidden;
-      transition: border-color .13s;
-    }
-
-    .vg-card:hover {
-      border-color: var(--border2);
-    }
-
-    .vg-thumb {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: linear-gradient(135deg, var(--bg3) 0%, var(--bg5) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 6px;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .vg-thumb-bars {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: flex-end;
-      padding: 10px;
-      gap: 2px;
-      opacity: .25;
-    }
-
-    .vg-play {
-      width: 40px;
-      height: 40px;
-      background: rgba(33, 217, 122, .12);
-      border: 1.5px solid var(--acc);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      z-index: 1;
-      transition: all .13s;
-    }
-
-    .vg-thumb:hover .vg-play {
-      background: rgba(33, 217, 122, .25);
-      transform: scale(1.1);
-    }
-
-    .vg-play::after {
-      content: '▶';
-      font-size: 13px;
-      color: var(--acc);
-      margin-left: 2px;
-    }
-
-    .vg-status {
-      font-size: 10px;
-      color: var(--acc);
-      position: relative;
-      z-index: 1;
-    }
-
-    .vg-info {
-      padding: 12px 14px;
-    }
-
-    .vg-num {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--acc);
-      letter-spacing: .06em;
-      margin-bottom: 3px;
-    }
-
-    .vg-title {
-      font-size: 13px;
-      color: var(--txt);
-      font-weight: 500;
-      margin-bottom: 6px;
-      line-height: 1.35;
-    }
-
-    .vg-prompt {
-      font-size: 11.5px;
-      color: var(--t2);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .vg-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .vg-btn {
-      flex: 1;
-      padding: 7px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      color: var(--t2);
-      font-size: 11.5px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      text-align: center;
-      transition: all .13s;
-    }
-
-    .vg-btn.primary {
-      background: var(--adim);
-      border-color: rgba(33, 217, 122, .25);
-      color: var(--acc);
-    }
-
-    .vg-btn:hover {
-      border-color: var(--acc);
-      color: var(--acc);
-    }
-
-    .empty-vg {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--t3);
-    }
-
-    .empty-vg-ico {
-      font-size: 42px;
-      opacity: .15;
-      margin-bottom: 12px;
-    }
-
-    .empty-vg-t {
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .empty-vg-hint {
-      font-size: 12px;
-      color: var(--t3);
-      margin-top: 6px;
-    }
-
-    /* ── EMPTY STATE ── */
-    .empty {
-      text-align: center;
-      padding: 56px 0;
-    }
-
-    .empty-ico {
-      font-size: 38px;
-      opacity: .12;
-      margin-bottom: 10px;
-    }
-
-    .empty-t {
-      font-size: 13px;
-      color: var(--t3);
-      line-height: 1.6;
-    }
-
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 10px;
-    }
-
-    /* ── MOBILE ── */
-    @media(max-width:700px) {
-      .shell {
-        flex-direction: column;
-      }
-
-      .sidebar:not(.drawer) {
-        display: none;
-      }
-
-      .mob-header {
-        display: flex;
-      }
-
-      .main {
-        flex: 1;
-        overflow-y: auto;
-      }
-
-      .main-inner {
-        padding: 16px;
-      }
-
-      .pg-title {
-        font-size: 20px;
-      }
-
-      .ex-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 6px;
-      }
-
-      .dl-row {
-        flex-direction: column;
-      }
-
-      .dl-btn {
-        width: 100%;
-      }
-
-      .vg-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .ttab {
-        font-size: 12px;
-        padding: 6px 11px;
-      }
-    }
-
-    @media(max-width:400px) {
-      .ex-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🎬 Viral Scene Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090c;--bg2:#0e1118;--bg3:#141922;--bg4:#1a2030;--bg5:#202840;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --acc:#21d97a;--acc2:#17b864;--adim:rgba(33,217,122,0.10);--aglow:rgba(33,217,122,0.20);
+  --txt:#edf0f6;--t2:#7d8899;--t3:#3d4557;
+  --red:#ff4f4f;--amber:#ffb020;--blue:#4b9eff;--purple:#a78bfa;
+  --r:10px;--rl:14px;--sidebar:228px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;background:var(--bg);}
+body{min-height:100%;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+/* ── SHELL ── */
+.shell{display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR desktop ── */
+.sidebar{
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:16px 11px;gap:3px;overflow-y:auto;
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+}
+.brand{display:flex;align-items:center;gap:9px;padding:3px 5px 15px;border-bottom:1px solid var(--border);margin-bottom:5px;}
+.brand-ico{width:33px;height:33px;background:var(--acc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;line-height:1.2;}
+.brand-sub{font-size:10px;color:var(--t3);}
+.nav-grp{font-size:9.5px;font-weight:600;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;padding:10px 6px 3px;}
+.nav-i{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:var(--r);border:1px solid transparent;color:var(--t2);font-size:12.5px;cursor:pointer;transition:all .13s;background:transparent;width:100%;text-align:left;}
+.nav-i:hover{background:var(--bg3);color:var(--txt);}
+.nav-i.active{background:var(--adim);color:var(--acc);border-color:rgba(33,217,122,.16);}
+.sb-bottom{margin-top:auto;padding-top:13px;border-top:1px solid var(--border);}
+.s-row{margin-bottom:9px;}
+.s-lbl{font-size:10px;color:var(--t3);margin-bottom:4px;display:flex;justify-content:space-between;}
+.s-lbl b{color:var(--acc);font-weight:600;}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bg4);outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--acc);cursor:pointer;}
+select.msel{width:100%;padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;appearance:none;}
+select.msel:focus{border-color:var(--acc);}
+
+/* ── MOBILE HEADER ── */
+.mob-header{display:none;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.mob-brand{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;}
+.mob-brand-ico{width:28px;height:28px;background:var(--acc);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.hamburger{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:4px;padding:10px 8px;}
+.hamburger span{display:block;width:18px;height:2px;background:var(--t2);border-radius:2px;transition:all .2s;}
+
+/* DRAWER overlay */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(2px);}
+.drawer-overlay.open{display:block;}
+.sidebar.drawer{position:fixed;left:0;top:0;bottom:0;z-index:201;transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,.5);}
+.sidebar.drawer.open{transform:translateX(0);}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.main-inner{padding:28px 32px;flex:1;}
+
+/* ── PAGE HEAD ── */
+.pg-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;letter-spacing:-.4px;margin-bottom:3px;}
+.pg-meta{font-size:12px;color:var(--t3);margin-bottom:22px;}
+.pg-meta b{color:var(--t2);font-weight:500;}
+
+/* ── TOP NAV TABS ── */
+.top-tabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none;}
+.top-tabs::-webkit-scrollbar{display:none;}
+.ttab{padding:6px 14px;border-radius:8px;border:none;background:transparent;color:var(--t2);font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .13s;white-space:nowrap;flex-shrink:0;}
+.ttab.active{background:var(--acc);color:#000;font-weight:600;}
+
+/* ── EXAMPLES ── */
+.ex-label{font-size:10.5px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.ex-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px;margin-bottom:18px;}
+.ex-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all .14s;text-align:left;width:100%;}
+.ex-card:hover,.ex-card:active{border-color:var(--acc);background:var(--adim);}
+.ex-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-bottom:6px;display:inline-block;}
+.tg-f{background:rgba(255,176,32,.14);color:var(--amber);}
+.tg-d{background:rgba(255,79,79,.14);color:var(--red);}
+.tg-m{background:rgba(75,158,255,.14);color:var(--blue);}
+.tg-l{background:rgba(33,217,122,.14);color:var(--acc);}
+.tg-s{background:rgba(244,114,182,.14);color:var(--pink);}
+.ex-ttl{font-size:12px;font-weight:500;color:var(--txt);margin-bottom:2px;line-height:1.35;}
+.ex-hook{font-size:11px;color:var(--t2);line-height:1.4;}
+
+/* ── INPUT ── */
+.icard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;margin-bottom:12px;}
+.f-lbl{font-size:10.5px;font-weight:600;color:var(--t2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em;}
+.inp{width:100%;padding:10px 13px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .13s;}
+.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--adim);}
+.inp::placeholder{color:var(--t3);}
+textarea.inp{min-height:130px;resize:vertical;line-height:1.75;}
+.or-line{text-align:center;font-size:11px;color:var(--t3);margin:10px 0;}
+.dropzone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .13s;}
+.dropzone:hover,.dropzone:active{border-color:var(--acc);}
+.dz-t{flex:1;font-size:12.5px;color:var(--t2);}
+.dz-h{font-size:11px;color:var(--t3);margin-top:2px;}
+.browse-btn{padding:6px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--t2);font-size:11.5px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;}
+.browse-btn:hover{border-color:var(--acc);color:var(--acc);}
+
+/* ── ANALYZE BTN ── */
+.analyze-btn{width:100%;padding:13px;background:var(--acc);color:#000;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .14s;margin-bottom:16px;letter-spacing:.01em;}
+.analyze-btn:hover{background:var(--acc2);box-shadow:0 6px 24px var(--aglow);transform:translateY(-1px);}
+.analyze-btn:active{transform:none;box-shadow:none;}
+.analyze-btn:disabled{background:var(--bg4);color:var(--t3);cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── ERROR ── */
+.err-box{background:rgba(255,79,79,.08);border:1px solid rgba(255,79,79,.22);border-radius:var(--r);padding:11px 15px;font-size:13px;color:var(--red);margin-bottom:12px;display:none;}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:48px 0;display:none;}
+.spinner{width:34px;height:34px;border:2.5px solid var(--bg4);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-msg{font-size:12.5px;color:var(--t3);}
+
+/* ── DL ROW ── */
+.dl-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.dl-btn{flex:1;min-width:140px;padding:9px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:center;transition:all .13s;}
+.dl-btn:hover,.dl-btn:active{border-color:var(--acc);color:var(--acc);background:var(--adim);}
+
+/* ── SCENE CARDS ── */
+.sc-head{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.sc-badge{background:var(--adim);color:var(--acc);font-size:11px;font-family:'DM Sans',sans-serif;font-weight:500;padding:2px 9px;border-radius:20px;border:1px solid rgba(33,217,122,.16);}
+.sc-card{border:1px solid var(--border);border-radius:var(--rl);margin-bottom:7px;overflow:hidden;transition:border-color .13s;}
+.sc-card.open{border-color:rgba(33,217,122,.22);}
+.sc-hdr{display:flex;align-items:center;gap:9px;padding:12px 15px;cursor:pointer;background:var(--bg2);user-select:none;}
+.sc-num{font-family:'Syne',sans-serif;font-weight:800;font-size:10px;color:var(--acc);min-width:52px;letter-spacing:.05em;}
+.sc-ttl{font-size:13px;color:var(--txt);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chev{color:var(--t3);font-size:11px;transition:transform .18s;flex-shrink:0;}
+.chev.open{transform:rotate(90deg);color:var(--acc);}
+.sc-body{display:none;background:var(--bg3);border-top:1px solid var(--border);padding:14px 16px;}
+.sc-body.open{display:block;animation:fd .18s ease;}
+@keyframes fd{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:none;}}
+.pb{margin-bottom:12px;}
+.pb:last-child{margin-bottom:0;}
+.pt{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;}
+.cp-btn{padding:3px 9px;background:transparent;border:1px solid var(--border2);border-radius:5px;color:var(--t3);font-size:10.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .12s;}
+.cp-btn:hover,.cp-btn.copied{border-color:var(--acc);color:var(--acc);}
+.beat-txt{font-size:13px;color:var(--txt);background:var(--bg2);border-left:3px solid var(--acc);border-radius:0 var(--r) var(--r) 0;padding:9px 12px;line-height:1.65;font-style:italic;}
+.pr-txt{font-size:12.5px;color:var(--t2);background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;line-height:1.65;}
+
+/* ── GEN BTN per scene ── */
+.gen-btn{width:100%;margin-top:10px;padding:10px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);color:var(--t2);font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .13s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.gen-btn:hover{background:var(--adim);border-color:var(--acc);color:var(--acc);}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed;}
+.gen-btn.generating{border-color:var(--amber);color:var(--amber);}
+.gen-btn.done{border-color:var(--acc);color:var(--acc);background:var(--adim);}
+
+/* ── VIDEO PREVIEW CARD ── */
+.vid-preview{margin-top:10px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:none;}
+.vid-preview.show{display:block;animation:fd .2s ease;}
+.vid-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg3),var(--bg5));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;position:relative;overflow:hidden;}
+.vid-thumb-bars{position:absolute;inset:0;display:flex;align-items:flex-end;padding:12px;gap:2px;opacity:.3;}
+.bar{flex:1;background:var(--acc);border-radius:2px 2px 0 0;animation:barAnim 1.2s ease-in-out infinite;}
+.bar:nth-child(2){animation-delay:.1s;}
+.bar:nth-child(3){animation-delay:.2s;}
+.bar:nth-child(4){animation-delay:.15s;}
+.bar:nth-child(5){animation-delay:.05s;}
+.bar:nth-child(6){animation-delay:.25s;}
+.bar:nth-child(7){animation-delay:.1s;}
+.bar:nth-child(8){animation-delay:.2s;}
+@keyframes barAnim{0%,100%{height:20%;}50%{height:80%;}}
+.vid-play-ico{width:48px;height:48px;background:rgba(33,217,122,.15);border:2px solid var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.vid-play-ico::after{content:'▶';font-size:16px;color:var(--acc);margin-left:3px;}
+.vid-label{font-size:11px;color:var(--t2);position:relative;z-index:1;text-align:center;padding:0 16px;}
+.vid-meta{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;}
+.vid-meta-l{font-size:12px;color:var(--t2);}
+.vid-meta-r{display:flex;gap:6px;}
+.vid-action{padding:5px 10px;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--t2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .12s;}
+.vid-action:hover{border-color:var(--acc);color:var(--acc);}
+
+/* ── VIDEO GEN TAB ── */
+.vidgen-wrap{display:none;}
+.vidgen-wrap.active{display:block;}
+.vg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:14px;}
+.vg-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;transition:border-color .13s;}
+.vg-card:hover{border-color:var(--border2);}
+.vg-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg3) 0%,var(--bg5) 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;position:relative;overflow:hidden;cursor:pointer;}
+.vg-thumb-bars{position:absolute;inset:0;display:flex;align-items:flex-end;padding:10px;gap:2px;opacity:.25;}
+.vg-play{width:40px;height:40px;background:rgba(33,217,122,.12);border:1.5px solid var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all .13s;}
+.vg-thumb:hover .vg-play{background:rgba(33,217,122,.25);transform:scale(1.1);}
+.vg-play::after{content:'▶';font-size:13px;color:var(--acc);margin-left:2px;}
+.vg-status{font-size:10px;color:var(--acc);position:relative;z-index:1;}
+.vg-info{padding:12px 14px;}
+.vg-num{font-size:10px;font-weight:600;color:var(--acc);letter-spacing:.06em;margin-bottom:3px;}
+.vg-title{font-size:13px;color:var(--txt);font-weight:500;margin-bottom:6px;line-height:1.35;}
+.vg-prompt{font-size:11.5px;color:var(--t2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.vg-actions{display:flex;gap:6px;margin-top:10px;}
+.vg-btn{flex:1;padding:7px;background:transparent;border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:11.5px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:center;transition:all .13s;}
+.vg-btn.primary{background:var(--adim);border-color:rgba(33,217,122,.25);color:var(--acc);}
+.vg-btn:hover{border-color:var(--acc);color:var(--acc);}
+.empty-vg{text-align:center;padding:60px 20px;color:var(--t3);}
+.empty-vg-ico{font-size:42px;opacity:.15;margin-bottom:12px;}
+.empty-vg-t{font-size:13px;line-height:1.6;}
+.empty-vg-hint{font-size:12px;color:var(--t3);margin-top:6px;}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:56px 0;}
+.empty-ico{font-size:38px;opacity:.12;margin-bottom:10px;}
+.empty-t{font-size:13px;color:var(--t3);line-height:1.6;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:10px;}
+
+/* ── MOBILE ── */
+@media(max-width:700px){
+  .shell{flex-direction:column;}
+  .sidebar:not(.drawer){display:none;}
+  .mob-header{display:flex;}
+  .main{flex:1;overflow-y:auto;}
+  .main-inner{padding:16px;}
+  .pg-title{font-size:20px;}
+  .ex-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;}
+  .dl-row{flex-direction:column;}
+  .dl-btn{width:100%;}
+  .vg-grid{grid-template-columns:1fr;}
+  .ttab{font-size:12px;padding:6px 11px;}
+}
+@media(max-width:400px){
+  .ex-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
 </head>
-
 <body>
 
-  <!-- DRAWER OVERLAY -->
-  <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 
-  <!-- SIDEBAR (desktop) -->
-  <div class="shell">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-ico">🎬</div>
-        <div>
-          <div class="brand-name">Scene Builder</div>
-          <div class="brand-sub">by Claude</div>
-        </div>
+<!-- SIDEBAR (desktop) -->
+<div class="shell">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-ico">🎬</div>
+    <div><div class="brand-name">Scene Builder</div><div class="brand-sub">by Claude</div></div>
+  </div>
+  <div class="nav-grp">Navigation</div>
+  <button class="nav-i" onclick="switchPage('scene')">📋 All Projects</button>
+  <button class="nav-i active" id="nav-scene" onclick="switchPage('scene')">🎬 Scene Builder</button>
+  <button class="nav-i" id="nav-vidgen" onclick="switchPage('vidgen')">✨ Video Generation</button>
+  <button class="nav-i">📦 Export</button>
+  <div class="sb-bottom">
+    <div class="s-row">
+      <div class="s-lbl">Duration <b style="color:var(--acc)">30s fixed</b></div>
+      <div style="display:flex;gap:4px;margin-top:4px;">
+        <div style="flex:1;text-align:center;padding:4px;background:var(--adim);border:1px solid rgba(33,217,122,.2);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">TikTok</div>
+        <div style="flex:1;text-align:center;padding:4px;background:var(--adim);border:1px solid rgba(33,217,122,.2);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">Reels</div>
+        <div style="flex:1;text-align:center;padding:4px;background:var(--adim);border:1px solid rgba(33,217,122,.2);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">Shorts</div>
       </div>
-      <div class="nav-grp">Navigation</div>
-      <button class="nav-i" onclick="switchPage('scene')">📋 All Projects</button>
-      <button class="nav-i active" id="nav-scene" onclick="switchPage('scene')">🎬 Scene Builder</button>
-      <button class="nav-i" id="nav-vidgen" onclick="switchPage('vidgen')">✨ Video Generation</button>
-      <button class="nav-i">📦 Export</button>
-      <div class="sb-bottom">
-        <div class="s-row">
-          <div class="s-lbl">Duration <b style="color:var(--acc)">30s fixed</b></div>
-          <div style="display:flex;gap:4px;margin-top:4px;">
-            <div
-              style="flex:1;text-align:center;padding:4px;background:var(--adim);border:1px solid rgba(33,217,122,.2);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">
-              TikTok</div>
-            <div
-              style="flex:1;text-align:center;padding:4px;background:var(--adim);border:1px solid rgba(33,217,122,.2);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">
-              Reels</div>
-            <div
-              style="flex:1;text-align:center;padding:4px;background:var(--adim);border:1px solid rgba(33,217,122,.2);border-radius:var(--r);font-size:10px;color:var(--acc);font-weight:600;">
-              Shorts</div>
-          </div>
-        </div>
-        <div class="s-row">
-          <div class="s-lbl">Style</div>
-          <select class="msel" id="style-sel" onchange="updateMeta()">
-            <option>Cinematic</option>
-            <option>Documentary</option>
-            <option>Vlog</option>
-            <option>Aesthetic</option>
-            <option>Anime</option>
-            <option>Minimalist</option>
-          </select>
-        </div>
-        <div class="s-row">
-          <div class="s-lbl">Language</div>
-          <select class="msel" id="lang-sel" onchange="updateMeta()">
-            <option>Thai</option>
-            <option>English</option>
-            <option>Japanese</option>
-          </select>
-        </div>
-      </div>
-    </aside>
+    </div>
+    <div class="s-row">
+      <div class="s-lbl">Style</div>
+      <select class="msel" id="style-sel" onchange="updateMeta()">
+        <option>Cinematic</option><option>Documentary</option><option>Vlog</option>
+        <option>Aesthetic</option><option>Anime</option><option>Minimalist</option>
+      </select>
+    </div>
+    <div class="s-row">
+      <div class="s-lbl">Language</div>
+      <select class="msel" id="lang-sel" onchange="updateMeta()">
+        <option>Thai</option><option>English</option><option>Japanese</option>
+      </select>
+    </div>
+  </div>
+</aside>
 
-    <!-- MAIN -->
-    <main class="main">
+<!-- MAIN -->
+<main class="main">
 
-      <!-- MOBILE HEADER -->
-      <div class="mob-header">
-        <div class="mob-brand">
-          <div class="mob-brand-ico">🎬</div>
-          Scene Builder
-        </div>
-        <div class="hamburger" onclick="openDrawer()">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
+  <!-- MOBILE HEADER -->
+  <div class="mob-header">
+    <div class="mob-brand">
+      <div class="mob-brand-ico">🎬</div>
+      Scene Builder
+    </div>
+    <div class="hamburger" onclick="openDrawer()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
 
-      <div class="main-inner">
+  <div class="main-inner">
 
-        <!-- ══ PAGE: SCENE BUILDER ══ -->
-        <div id="page-scene">
-          <div class="pg-title">🎬 Scene Builder</div>
-          <div class="pg-meta" id="pg-meta">Style: <b>Cinematic</b> · <b>3 scenes × 10s = 30s</b> · Language:
-            <b>Thai</b> · TikTok / Reels / Shorts
-          </div>
+    <!-- ══ PAGE: SCENE BUILDER ══ -->
+    <div id="page-scene">
+      <div class="pg-title">🎬 Scene Builder</div>
+      <div class="pg-meta" id="pg-meta">Style: <b>Cinematic</b> · <b>3 scenes × 10s = 30s</b> · Language: <b>Thai</b> · TikTok / Reels / Shorts</div>
 
-          <!-- API KEYS CARD -->
-          <div
-            style="background:var(--bg2);border:1.5px solid rgba(33,217,122,.2);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px;">
-            <div
-              style="font-size:11px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">
-              🔑 API Keys — ใส่ครั้งเดียวใช้ได้ทั้ง app</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div>
-                <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Claude API Key (Scene Builder)</div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div id="claude-dot"
-                    style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;">
-                  </div>
-                  <input id="claude-key-inp" type="password" placeholder="sk-ant-api03-..."
-                    style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
-                    oninput="checkClaudeKey()" onfocus="this.style.borderColor='var(--acc)'"
-                    onblur="this.style.borderColor='var(--border2)'">
-                  <button onclick="toggleClaudeVis()" id="claude-vis-btn"
-                    style="padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">show</button>
-                </div>
-                <div style="font-size:10px;color:var(--t3);margin-top:4px;">console.anthropic.com/keys</div>
-              </div>
-              <div>
-                <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Kling API Key + Worker URL (Video Gen)
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div id="kling-dot-top"
-                    style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;">
-                  </div>
-                  <input id="kling-key-top" type="password" placeholder="Kling key จาก kie.ai/dashboard"
-                    style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
-                    oninput="syncKlingKey(this.value)" onfocus="this.style.borderColor='var(--amber)'"
-                    onblur="this.style.borderColor='var(--border2)'">
-                </div>
-                <input id="worker-url-top" type="text" placeholder="https://kie-proxy.xxx.workers.dev"
-                  style="width:100%;margin-top:5px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;"
-                  oninput="syncWorkerUrl(this.value)" onfocus="this.style.borderColor='var(--amber)'"
-                  onblur="this.style.borderColor='var(--border2)'">
-                <div style="font-size:10px;color:var(--t3);margin-top:4px;">kie.ai/dashboard · Workers proxy URL</div>
-              </div>
+      <!-- API KEYS CARD -->
+      <div style="background:var(--bg2);border:1.5px solid rgba(33,217,122,.2);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px;">
+        <div style="font-size:11px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">🔑 API Keys — ใส่ครั้งเดียวใช้ได้ทั้ง app</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Claude API Key (Scene Builder)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div id="claude-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
+              <input id="claude-key-inp" type="password" placeholder="sk-ant-api03-..."
+                style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
+                oninput="checkClaudeKey()"
+                onfocus="this.style.borderColor='var(--acc)'"
+                onblur="this.style.borderColor='var(--border2)'">
+              <button onclick="toggleClaudeVis()" id="claude-vis-btn"
+                style="padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">show</button>
             </div>
-            <div id="keys-status" style="margin-top:8px;font-size:11px;color:var(--t3);">ใส่ Claude API Key
-              เพื่อเริ่มสร้าง scenes</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px;">console.anthropic.com/keys</div>
           </div>
-
-          <!-- Input mode tabs -->
-          <div class="top-tabs">
-            <button class="ttab" id="tab-story" onclick="setMode('story')">📝 เขียน Story</button>
-            <button class="ttab active" id="tab-yt" onclick="setMode('youtube')">🎥 YouTube URL</button>
-          </div>
-
-          <!-- Viral Examples -->
-          <div class="ex-label">🔥 Viral โหดๆ — แตะเพื่อโหลด</div>
-          <div class="ex-grid" id="ex-grid-viral"></div>
-          <div class="ex-label" style="margin-top:4px;">🛒 ปักตะกร้าสินค้า — TikTok Shop 2026</div>
-          <div class="ex-grid" id="ex-grid-shop"></div>
-
-          <!-- YouTube input -->
-          <div id="mode-yt">
-            <div class="icard">
-              <div class="f-lbl">YouTube URL</div>
-              <input class="inp" id="yt-url" placeholder="https://www.youtube.com/watch?v=..."
-                style="margin-bottom:10px">
-              <div class="or-line">— หรืออัปโหลดไฟล์ —</div>
-              <div class="dropzone" onclick="document.getElementById('fi').click()">
-                <div style="font-size:20px;opacity:.35">☁️</div>
-                <div class="dz-t"><span id="fn">Drag and drop / แตะเพื่อเลือกไฟล์</span>
-                  <div class="dz-h">MP4, MOV, MKV, WEBM · max 200MB</div>
-                </div>
-                <button class="browse-btn"
-                  onclick="event.stopPropagation();document.getElementById('fi').click()">เลือก</button>
-                <input type="file" id="fi" accept="video/*" style="display:none"
-                  onchange="document.getElementById('fn').textContent='✓ '+this.files[0].name">
-              </div>
+          <div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Kling API Key + Worker URL (Video Gen)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div id="kling-dot-top" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
+              <input id="kling-key-top" type="password" placeholder="Kling key จาก kie.ai/dashboard"
+                style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
+                oninput="syncKlingKey(this.value)"
+                onfocus="this.style.borderColor='var(--amber)'"
+                onblur="this.style.borderColor='var(--border2)'">
             </div>
+            <input id="worker-url-top" type="text" placeholder="https://kie-proxy.xxx.workers.dev"
+              style="width:100%;margin-top:5px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;"
+              oninput="syncWorkerUrl(this.value)"
+              onfocus="this.style.borderColor='var(--amber)'"
+              onblur="this.style.borderColor='var(--border2)'">
+            <div style="font-size:10px;color:var(--t3);margin-top:4px;">kie.ai/dashboard · Workers proxy URL</div>
           </div>
+        </div>
+        <div id="keys-status" style="margin-top:8px;font-size:11px;color:var(--t3);">ใส่ Claude API Key เพื่อเริ่มสร้าง scenes</div>
+      </div>
 
-          <!-- Story input -->
-          <div id="mode-story" style="display:none">
-            <div class="icard">
-              <div class="f-lbl">Story / Plot / Script</div>
-              <textarea class="inp" id="story-txt" placeholder="วาง story ที่นี่...
+      <!-- Input mode tabs -->
+      <div class="top-tabs">
+        <button class="ttab" id="tab-story" onclick="setMode('story')">📝 เขียน Story</button>
+        <button class="ttab active" id="tab-yt" onclick="setMode('youtube')">🎥 YouTube URL</button>
+      </div>
+
+      <!-- Viral Examples -->
+      <div class="ex-label">🔥 Viral โหดๆ — แตะเพื่อโหลด</div>
+      <div class="ex-grid" id="ex-grid-viral"></div>
+      <div class="ex-label" style="margin-top:4px;">🛒 ปักตะกร้าสินค้า — TikTok Shop 2026</div>
+      <div class="ex-grid" id="ex-grid-shop"></div>
+
+      <!-- YouTube input -->
+      <div id="mode-yt">
+        <div class="icard">
+          <div class="f-lbl">YouTube URL</div>
+          <input class="inp" id="yt-url" placeholder="https://www.youtube.com/watch?v=..." style="margin-bottom:10px">
+          <div class="or-line">— หรืออัปโหลดไฟล์ —</div>
+          <div class="dropzone" onclick="document.getElementById('fi').click()">
+            <div style="font-size:20px;opacity:.35">☁️</div>
+            <div class="dz-t"><span id="fn">Drag and drop / แตะเพื่อเลือกไฟล์</span><div class="dz-h">MP4, MOV, MKV, WEBM · max 200MB</div></div>
+            <button class="browse-btn" onclick="event.stopPropagation();document.getElementById('fi').click()">เลือก</button>
+            <input type="file" id="fi" accept="video/*" style="display:none" onchange="document.getElementById('fn').textContent='✓ '+this.files[0].name">
+          </div>
+        </div>
+      </div>
+
+      <!-- Story input -->
+      <div id="mode-story" style="display:none">
+        <div class="icard">
+          <div class="f-lbl">Story / Plot / Script</div>
+          <textarea class="inp" id="story-txt" placeholder="วาง story ที่นี่...
 
 ตัวอย่าง:
 HOOK: นี่คือเหตุผลที่คุณยังจน
 BUILD-UP: ไม่ใช่เพราะคุณขี้เกียจ...
 PAYOFF: แต่เพราะคุณคิดแบบนี้"></textarea>
-            </div>
+        </div>
+      </div>
+
+      <!-- REFERENCE IMAGE — shared, always visible -->
+      <div class="icard" style="border-color:rgba(255,176,32,.2);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div class="f-lbl" style="margin-bottom:0;color:var(--amber);">📎 Reference Image <span style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0;">(สำหรับ Character / Product Consistency)</span></div>
+          <div id="ref-clear" onclick="clearRefImg()" style="display:none;font-size:11px;color:var(--red);cursor:pointer;padding:2px 8px;border:1px solid rgba(255,79,79,.3);border-radius:6px;">✕ ลบ</div>
+        </div>
+        <div id="ref-drop" class="dropzone" style="border-color:rgba(255,176,32,.25);padding:12px 14px;" onclick="document.getElementById('ref-fi').click()">
+          <div style="font-size:18px;opacity:.5;">🖼️</div>
+          <div class="dz-t">
+            <span id="ref-fn">อัปโหลด reference image (ตัวละคร / สินค้า)</span>
+            <div class="dz-h">JPG, PNG, WEBP · ใช้เป็น first frame ทุก scene → character consistent</div>
           </div>
-
-          <!-- REFERENCE IMAGE — shared, always visible -->
-          <div class="icard" style="border-color:rgba(255,176,32,.2);margin-bottom:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-              <div class="f-lbl" style="margin-bottom:0;color:var(--amber);">📎 Reference Image <span
-                  style="font-size:10px;color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0;">(สำหรับ
-                  Character / Product Consistency)</span></div>
-              <div id="ref-clear" onclick="clearRefImg()"
-                style="display:none;font-size:11px;color:var(--red);cursor:pointer;padding:2px 8px;border:1px solid rgba(255,79,79,.3);border-radius:6px;">
-                ✕ ลบ</div>
+          <button class="browse-btn" style="border-color:rgba(255,176,32,.3);color:var(--amber);" onclick="event.stopPropagation();document.getElementById('ref-fi').click()">เลือก</button>
+          <input type="file" id="ref-fi" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleRefImg(this)">
+        </div>
+        <div id="ref-preview" style="display:none;margin-top:10px;display:none;gap:10px;align-items:flex-start;">
+          <img id="ref-img" style="width:54px;height:96px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,176,32,.3);flex-shrink:0;" src="">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;color:var(--amber);font-weight:500;margin-bottom:3px;">✓ Reference โหลดแล้ว</div>
+            <div id="ref-type-label" style="font-size:11px;color:var(--t2);line-height:1.5;"></div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+              <div id="ref-mode-char" onclick="setRefMode('character')" style="font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,176,32,.3);color:var(--amber);background:rgba(255,176,32,.08);">👤 ตัวละคร</div>
+              <div id="ref-mode-prod" onclick="setRefMode('product')" style="font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--t2);">📦 สินค้า</div>
             </div>
-            <div id="ref-drop" class="dropzone" style="border-color:rgba(255,176,32,.25);padding:12px 14px;"
-              onclick="document.getElementById('ref-fi').click()">
-              <div style="font-size:18px;opacity:.5;">🖼️</div>
-              <div class="dz-t">
-                <span id="ref-fn">อัปโหลด reference image (ตัวละคร / สินค้า)</span>
-                <div class="dz-h">JPG, PNG, WEBP · ใช้เป็น first frame ทุก scene → character consistent</div>
-              </div>
-              <button class="browse-btn" style="border-color:rgba(255,176,32,.3);color:var(--amber);"
-                onclick="event.stopPropagation();document.getElementById('ref-fi').click()">เลือก</button>
-              <input type="file" id="ref-fi" accept="image/jpeg,image/png,image/webp" style="display:none"
-                onchange="handleRefImg(this)">
-            </div>
-            <div id="ref-preview" style="display:none;margin-top:10px;display:none;gap:10px;align-items:flex-start;">
-              <img id="ref-img"
-                style="width:54px;height:96px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,176,32,.3);flex-shrink:0;"
-                src="">
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:11px;color:var(--amber);font-weight:500;margin-bottom:3px;">✓ Reference โหลดแล้ว
-                </div>
-                <div id="ref-type-label" style="font-size:11px;color:var(--t2);line-height:1.5;"></div>
-                <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
-                  <div id="ref-mode-char" onclick="setRefMode('character')"
-                    style="font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,176,32,.3);color:var(--amber);background:rgba(255,176,32,.08);">
-                    👤 ตัวละคร</div>
-                  <div id="ref-mode-prod" onclick="setRefMode('product')"
-                    style="font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--t2);">
-                    📦 สินค้า</div>
-                </div>
-                <div id="ref-tip" style="margin-top:6px;font-size:10px;color:var(--t3);line-height:1.5;"></div>
-              </div>
-            </div>
-          </div>
-
-          <button class="analyze-btn" id="analyze-btn" onclick="analyze()">🔍 วิเคราะห์และสร้าง Scenes</button>
-          <div class="err-box" id="err-box"></div>
-
-          <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <div class="load-msg" id="load-msg">กำลังวิเคราะห์...</div>
-          </div>
-
-          <div id="results" style="display:none">
-            <div class="dl-row">
-              <button class="dl-btn" onclick="dlAll('img')">⬇️ img_prompts.txt</button>
-              <button class="dl-btn" onclick="dlAll('video')">⬇️ video_prompts.txt</button>
-              <button class="dl-btn" onclick="switchPage('vidgen')" id="gen-all-btn"
-                style="border-color:rgba(33,217,122,.3);color:var(--acc);">✨ Video Generation →</button>
-            </div>
-            <div class="sc-head">🎞️ Scenes <span class="sc-badge" id="sc-count">0</span></div>
-            <div id="sc-list"></div>
-          </div>
-
-          <div class="empty" id="empty">
-            <div class="empty-ico">🎬</div>
-            <div class="empty-t">เลือก template viral หรือใส่ YouTube URL<br>แล้วกด "วิเคราะห์และสร้าง Scenes"</div>
+            <div id="ref-tip" style="margin-top:6px;font-size:10px;color:var(--t3);line-height:1.5;"></div>
           </div>
         </div>
+      </div>
 
-        <!-- ══ PAGE: VIDEO GENERATION ══ -->
-        <div id="page-vidgen" style="display:none">
-          <div class="pg-title">✨ Video Generation</div>
-          <div class="pg-meta">9:16 Vertical · TikTok / Reels / Shorts · Mock Preview</div>
+      <button class="analyze-btn" id="analyze-btn" onclick="analyze()">🔍 วิเคราะห์และสร้าง Scenes</button>
+      <div class="err-box" id="err-box"></div>
 
-          <div id="vg-empty" class="empty-vg">
-            <div class="empty-vg-ico">🎥</div>
-            <div class="empty-vg-t">ยังไม่มี scenes<br>ไปสร้าง scenes ก่อนที่ Scene Builder</div>
-            <button class="analyze-btn" style="margin-top:20px;max-width:240px" onclick="switchPage('scene')">← กลับไป
-              Scene Builder</button>
-          </div>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="load-msg" id="load-msg">กำลังวิเคราะห์...</div>
+      </div>
 
-          <div id="vg-content" style="display:none">
-            <div id="vg-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;">
-            </div>
-            <!-- Kling API Key -->
-            <div
-              style="background:var(--bg2);border:1.5px solid rgba(255,176,32,.35);border-radius:var(--rl);padding:14px 16px;margin-bottom:14px;">
-              <div
-                style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">
-                🔑 Kling API Key</div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div id="kling-dot"
-                  style="width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;">
-                </div>
-                <input id="kling-key-inp" type="password" placeholder="วาง API Key ที่นี่..."
-                  style="flex:1;padding:9px 12px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;"
-                  oninput="checkKlingKey()" onfocus="this.style.borderColor='var(--amber)'"
-                  onblur="this.style.borderColor='var(--border2)'">
-                <button onclick="toggleKlingVis()" id="kling-vis-btn"
-                  style="padding:7px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">
-                  show
-                </button>
-              </div>
-              <div style="margin-top:8px;font-size:11px;color:var(--t3);line-height:1.7;">
-                รับ key ที่ <span style="color:var(--amber);cursor:pointer;"
-                  onclick="openLink&&openLink('https://kie.ai/dashboard')">kie.ai/dashboard</span> → API Keys → Create
-                <span style="margin-left:8px;color:var(--t3);">·</span>
-                <span style="margin-left:8px;">model: kling-2.6 · 9:16 · 10s · ~30 credits/scene</span>
-              </div>
-              <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
-                <span style="font-size:11px;color:var(--t3);white-space:nowrap;">Worker URL:</span>
-                <input id="worker-url-inp" type="text" placeholder="https://kie-proxy.YOUR.workers.dev"
-                  style="flex:1;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;"
-                  onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--border)'">
-              </div>
-              <div style="margin-top:5px;font-size:10px;color:var(--t3);">ต้องมี Cloudflare Worker proxy — ดูไฟล์ <span
-                  style="color:var(--amber);">kie-worker.js</span> ที่ download ไว้</div>
-              <div id="kling-key-status" style="display:none;margin-top:6px;font-size:11px;color:var(--acc);">✓ Key
-                พร้อมใช้งาน — ใส่ Worker URL แล้วกด Generate ได้เลย</div>
-            </div>
-            <div class="dl-row" style="margin-bottom:18px;">
-              <button class="dl-btn" onclick="switchPage('scene')">← Scene Builder</button>
-              <button class="dl-btn" id="vg-gen-all-btn" onclick="vgGenerateAll()"
-                style="border-color:rgba(33,217,122,.3);color:var(--acc);">✨ Generate All</button>
-              <button class="dl-btn" onclick="vgReset()">↺ Reset</button>
-            </div>
-            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
-              <div style="flex-shrink:0;">
-                <div id="vg-phone"
-                  style="width:155px;height:275px;background:#0a0a0f;border-radius:22px;border:2.5px solid var(--border2);position:relative;overflow:hidden;cursor:pointer;"
-                  onclick="vgCycleScene()">
-                  <div
-                    style="width:38px;height:6px;background:#1a1a2e;border-radius:3px;position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;">
-                  </div>
-                  <div id="vg-phone-bars"
-                    style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:8px;gap:2px;opacity:.15;">
-                  </div>
-                  <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
-                  <div id="vg-s-idle"
-                    style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;z-index:2;">
-                    <div
-                      style="width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;">
-                      ▶</div>
-                    <div id="vg-idle-txt"
-                      style="font-size:10px;color:rgba(255,255,255,.7);text-align:center;padding:0 12px;">เลือก
-                      scene<br>เพื่อ preview</div>
-                  </div>
-                  <div id="vg-s-gen"
-                    style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;">
-                    <div style="position:relative;width:56px;height:56px;">
-                      <svg width="56" height="56" viewBox="0 0 56 56" style="position:absolute;top:0;left:0;">
-                        <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="3.5" />
-                        <circle id="vg-ring" cx="28" cy="28" r="22" fill="none" stroke="#21d97a" stroke-width="3.5"
-                          stroke-linecap="round" stroke-dasharray="138" stroke-dashoffset="138"
-                          transform="rotate(-90 28 28)" />
-                      </svg>
-                      <div id="vg-ring-pct"
-                        style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#21d97a;">
-                        0%</div>
-                    </div>
-                    <div id="vg-gen-step" style="font-size:9px;color:rgba(255,255,255,.5);margin-top:8px;">กำลังสร้าง...
-                    </div>
-                  </div>
-                  <div id="vg-s-done"
-                    style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;z-index:2;">
-                    <div
-                      style="width:38px;height:38px;border-radius:50%;border:2px solid #21d97a;background:rgba(33,217,122,.15);display:flex;align-items:center;justify-content:center;font-size:16px;color:#21d97a;">
-                      ✓</div>
-                    <div id="vg-done-ttl" style="font-size:10px;color:#21d97a;text-align:center;padding:0 12px;">Ready
-                    </div>
-                    <div id="vg-done-sub" style="font-size:9px;color:rgba(255,255,255,.4);">8s · 9:16</div>
-                  </div>
-                  <div
-                    style="position:absolute;bottom:0;left:0;right:0;height:26px;background:rgba(0,0,0,.65);display:flex;align-items:center;padding:0 10px;gap:6px;z-index:3;">
-                    <div id="vg-pb-dot"
-                      style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);flex-shrink:0;">
-                    </div>
-                    <div style="flex:1;height:2px;background:rgba(255,255,255,.12);border-radius:1px;overflow:hidden;">
-                      <div id="vg-pb-fill" style="height:100%;background:#21d97a;border-radius:1px;width:0%;"></div>
-                    </div>
-                    <div id="vg-pb-time" style="font-size:8px;color:rgba(255,255,255,.4);">0:08</div>
-                  </div>
-                </div>
-                <div style="margin-top:8px;width:155px;">
-                  <div id="vg-scene-lbl"
-                    style="font-size:11px;color:var(--t2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    —</div>
-                  <div id="vg-nav-dots"
-                    style="display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap;"></div>
-                </div>
-              </div>
-              <div style="flex:1;min-width:0;" id="vg-scene-col"></div>
-            </div>
-            <div id="vg-log"
-              style="display:none;margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;max-height:90px;overflow-y:auto;">
-              <div id="vg-log-inner" style="font-size:11px;color:var(--t2);font-family:monospace;line-height:1.8;">
-              </div>
-            </div>
-          </div>
+      <div id="results" style="display:none">
+        <div class="dl-row">
+          <button class="dl-btn" onclick="dlAll('img')">⬇️ img_prompts.txt</button>
+          <button class="dl-btn" onclick="dlAll('video')">⬇️ video_prompts.txt</button>
+          <button class="dl-btn" onclick="switchPage('vidgen')" id="gen-all-btn" style="border-color:rgba(33,217,122,.3);color:var(--acc);">✨ Video Generation →</button>
         </div>
+        <div class="sc-head">🎞️ Scenes <span class="sc-badge" id="sc-count">0</span></div>
+        <div id="sc-list"></div>
+      </div>
 
-      </div><!-- /main-inner -->
-    </main>
-  </div><!-- /shell -->
+      <div class="empty" id="empty">
+        <div class="empty-ico">🎬</div>
+        <div class="empty-t">เลือก template viral หรือใส่ YouTube URL<br>แล้วกด "วิเคราะห์และสร้าง Scenes"</div>
+      </div>
+    </div>
 
-  <script>
-    // ─── DATA ──────────────────────────────────────────────────────
-    const EXAMPLES = [
-      {
-        tag: 'f', label: 'Finance', title: 'เหตุผลที่คุณยังจน', hook: 'นี่คือเหตุผลที่คุณยังจน',
-        story: `HOOK:\n"นี่คือเหตุผลที่คุณยังจน"\n\nBUILD-UP:\n"ไม่ใช่เพราะคุณขี้เกียจ หรือไม่ฉลาดพอ... แต่เพราะไม่มีใครสอนกฎข้อนี้ให้คุณตั้งแต่เด็ก"\n"คนรวยรู้ว่าเงินทำงานได้ คนจนไม่รู้ว่าตัวเองทำงานให้เงิน"\n"ทุกครั้งที่คุณซื้อของที่อยากได้ แทนของที่ต้องการ — คุณกำลังจ่ายภาษีให้คนรวย"\n\nPAYOFF:\n"แต่เพราะคุณคิดแบบนี้ — และมันเปลี่ยนได้ภายใน 30 วัน"`
-      },
-      {
-        tag: 'd', label: 'Dark Truth', title: 'ระบบออกแบบมาให้คุณแพ้', hook: 'ระบบการศึกษาสร้างมาเพื่อผลิตลูกจ้าง ไม่ใช่คนรวย',
-        story: `HOOK:\n"ระบบการศึกษาออกแบบมาให้คุณเป็นลูกจ้างที่ดี ไม่ใช่คนรวย"\n\nTWIST:\n"เกรด A ไม่เคยทำให้ใครรวยได้ มันแค่ทำให้คุณเชื่อฟัง"\n"บริษัทที่ใหญ่ที่สุดในโลกสร้างโดยคนที่ dropout"\n"คุณถูกสอนให้ทำงาน... ไม่ถูกสอนให้คิด"\n\nPAYOFF:\n"ถ้าคุณยังเล่นตามกฎของระบบ — คุณจะแพ้ตลอดไป"`
-      },
-      {
-        tag: 'm', label: 'Mindset', title: '5 นาทีที่เปลี่ยนทุกอย่าง', hook: 'คนที่ประสบความสำเร็จทำอะไรตอน 5 โมงเช้า?',
-        story: `HOOK:\n"คนที่ประสบความสำเร็จระดับโลก ทำสิ่งเดียวกันทุกเช้า"\n\nBUILD-UP:\n"ไม่ใช่ cold shower ไม่ใช่ journaling ไม่ใช่ exercise"\n"มันคือ 5 นาทีที่สมองยังไม่ตื่นเต็มที่ — hypnopompic state"\n"ในสถานะนี้ สมองรับข้อมูลได้เร็วกว่าปกติ 3 เท่า"\n\nPAYOFF:\n"ทำสิ่งนี้ 21 วัน — สมองคุณจะไม่เหมือนเดิมอีกต่อไป"`
-      },
-      {
-        tag: 'l', label: 'Lifestyle', title: 'คนรวยจริงๆ ไม่มีใครรู้จัก', hook: 'ทำไมคนรวยจริงๆ ไม่อยู่บน Instagram?',
-        story: `HOOK:\n"คนที่คุณเห็น flex บน social — ไม่ใช่คนรวยจริง"\n\nBUILD-UP:\n"คนรวยจริงๆ ไม่มีใครรู้จักชื่อ ไม่มีบน Instagram ไม่ขับ Lambo"\n"พวกเขานั่งในห้องประชุม ตัดสินใจว่าเศรษฐกิจของคุณจะเป็นยังไง"\n"ทุกสิ่งที่คุณถูกสอนให้อยาก — รถ บ้าน นาฬิกา — คือกับดักที่พวกเขาออกแบบ"\n\nPAYOFF:\n"เกมจริงๆ เล่นในที่ที่คุณมองไม่เห็น"`
-      },
-      {
-        tag: 'p', label: 'Psychology', title: 'สมองคุณถูก hack แล้ว', hook: 'ทุกแอปที่คุณใช้ออกแบบมาทำลายคุณ',
-        story: `HOOK:\n"Instagram, TikTok, YouTube — ออกแบบโดย neuroscientist เพื่อขโมยเวลาคุณ"\n\nBUILD-UP:\n"slot machine effect — ทุก swipe คือการดึง lever หวัง dopamine"\n"เด็กใน Silicon Valley ไม่ให้ลูกตัวเองใช้ iPad — รู้ว่ามันทำอะไรกับสมอง"\n"ทุก notification คือ interrupt ที่ทำให้ IQ คุณตกชั่วคราว 10 จุด"\n\nPAYOFF:\n"คุณไม่ได้ใช้แอป — แอปกำลังใช้คุณอยู่"`
-      },
-      {
-        tag: 'f', label: 'Wealth', title: 'กฎ 72 ที่โรงเรียนไม่สอน', hook: 'เงิน 1 แสน กลายเป็น 2 แสน โดยไม่ทำอะไร',
-        story: `HOOK:\n"มีกฎข้อเดียว ที่ทำให้เงินของคุณเพิ่มเป็น 2 เท่า โดยไม่ต้องทำอะไร"\n\nBUILD-UP:\n"กฎ 72 — หาร 72 ด้วยดอกเบี้ยที่ได้รับ = จำนวนปีที่เงิน x2"\n"ดอกเบี้ยธนาคาร 1% = 72 ปี | S&P500 เฉลี่ย 10% = 7.2 ปี"\n"Einstein เรียกมันว่า สิ่งมหัศจรรย์อันดับ 8 ของโลก"\n\nPAYOFF:\n"ทุกวันที่คุณรอ — คุณกำลังบริจาคเงินอนาคตให้คนอื่น"`
-      },
+    <!-- ══ PAGE: VIDEO GENERATION ══ -->
+    <div id="page-vidgen" style="display:none">
+      <div class="pg-title">✨ Video Generation</div>
+      <div class="pg-meta">9:16 Vertical · TikTok / Reels / Shorts · Mock Preview</div>
 
-      // ── ECOMMERCE / PRODUCT VIRAL ──────────────────────────────────
-      {
-        tag: 's', label: '🛒 Skincare Viral', title: 'เซรั่มที่สาวเกาหลีซ่อนไว้', hook: '#SkinTok 9 พันล้าน views — นี่คือตัวที่ทุกคนซื้อ',
-        story: `HOOK (0-3 วิ):\nมือถือสั่น notification เดียว "ของหมดแล้ว" — ภาพ sold out ทั่วทุกร้าน\n\nBUILD-UP:\n"Beauty of Joseon Glow Serum — $17 ขวดเล็ก แต่ขายได้ 8,500 ชิ้นบน TikTok Shop ในเดือนเดียว"\n"สาวเกาหลีใช้มา 10 ปีก่อนมันจะ viral — Glass Skin ไม่ได้แพง มันแค่ถูก formula ที่ใช่"\n"Hyaluronic + Niacinamide + Rice — 3 ตัวนี้ทำงานร่วมกัน ผิวอิ่มน้ำใน 7 วัน ไม่ต้องรีทัช"\n\nPAYOFF:\n"ลิงก์ในไบโอ — stock เหลือ 47 ชิ้น อย่ารอจนหมด"`
-      },
+      <div id="vg-empty" class="empty-vg">
+        <div class="empty-vg-ico">🎥</div>
+        <div class="empty-vg-t">ยังไม่มี scenes<br>ไปสร้าง scenes ก่อนที่ Scene Builder</div>
+        <button class="analyze-btn" style="margin-top:20px;max-width:240px" onclick="switchPage('scene')">← กลับไป Scene Builder</button>
+      </div>
 
-      {
-        tag: 's', label: '🛒 Gadget Drop', title: 'ของชิ้นนี้ทำให้ห้องดู $10K', hook: 'LED Galaxy Projector — ขาย 10,000 ชิ้นใน 2 สัปดาห์',
-        story: `HOOK (0-2 วิ):\nห้องมืดสนิท → เปิดสวิตช์ → ดาวเต็มเพดาน ASMR เสียง click เดียว\n\nBUILD-UP:\n"LED Galaxy Projector $15 — ปรากฏใน bedroom glow-up videos มากกว่า 2 ล้านคลิป"\n"ไม่ต้องทาสี ไม่ต้องตกแต่งใหม่ — แค่วางตรงมุม แล้วห้องธรรมดากลายเป็น aesthetic ทันที"\n"Gen Z ซื้อเพราะดูดี Gen Alpha ซื้อเพราะ study-with-me — 2 กลุ่มในคลิปเดียว"\n\nPAYOFF + CTA:\n"Swipe up เพื่อดูสีที่เหลือ — จัดส่งใน 3 วัน ฟรีค่าส่งวันนี้เท่านั้น"`
-      },
+      <div id="vg-content" style="display:none">
+        <div id="vg-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;"></div>
+        <!-- Kling API Key -->
+        <div style="background:var(--bg2);border:1.5px solid rgba(255,176,32,.35);border-radius:var(--rl);padding:14px 16px;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">🔑 Kling API Key</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div id="kling-dot" style="width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
+            <input id="kling-key-inp" type="password"
+              placeholder="วาง API Key ที่นี่..."
+              style="flex:1;padding:9px 12px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;"
+              oninput="checkKlingKey()"
+              onfocus="this.style.borderColor='var(--amber)'"
+              onblur="this.style.borderColor='var(--border2)'">
+            <button onclick="toggleKlingVis()" id="kling-vis-btn"
+              style="padding:7px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">
+              show
+            </button>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--t3);line-height:1.7;">
+            รับ key ที่ <span style="color:var(--amber);cursor:pointer;" onclick="openLink&&openLink('https://kie.ai/dashboard')">kie.ai/dashboard</span> → API Keys → Create
+            <span style="margin-left:8px;color:var(--t3);">·</span>
+            <span style="margin-left:8px;">model: kling-2.6 · 9:16 · 10s · ~30 credits/scene</span>
+          </div>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:11px;color:var(--t3);white-space:nowrap;">Worker URL:</span>
+            <input id="worker-url-inp" type="text"
+              placeholder="https://kie-proxy.YOUR.workers.dev"
+              style="flex:1;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;"
+              onfocus="this.style.borderColor='var(--amber)'"
+              onblur="this.style.borderColor='var(--border)'">
+          </div>
+          <div style="margin-top:5px;font-size:10px;color:var(--t3);">ต้องมี Cloudflare Worker proxy — ดูไฟล์ <span style="color:var(--amber);">kie-worker.js</span> ที่ download ไว้</div>
+          <div id="kling-key-status" style="display:none;margin-top:6px;font-size:11px;color:var(--acc);">✓ Key พร้อมใช้งาน — ใส่ Worker URL แล้วกด Generate ได้เลย</div>
+        </div>
+        <div class="dl-row" style="margin-bottom:18px;">
+          <button class="dl-btn" onclick="switchPage('scene')">← Scene Builder</button>
+          <button class="dl-btn" id="vg-gen-all-btn" onclick="vgGenerateAll()" style="border-color:rgba(33,217,122,.3);color:var(--acc);">✨ Generate All</button>
+          <button class="dl-btn" onclick="vgReset()">↺ Reset</button>
+        </div>
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="flex-shrink:0;">
+            <div id="vg-phone" style="width:155px;height:275px;background:#0a0a0f;border-radius:22px;border:2.5px solid var(--border2);position:relative;overflow:hidden;cursor:pointer;" onclick="vgCycleScene()">
+              <div style="width:38px;height:6px;background:#1a1a2e;border-radius:3px;position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;"></div>
+              <div id="vg-phone-bars" style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:8px;gap:2px;opacity:.15;"></div>
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
+              <div id="vg-s-idle" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;z-index:2;">
+                <div style="width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;">▶</div>
+                <div id="vg-idle-txt" style="font-size:10px;color:rgba(255,255,255,.7);text-align:center;padding:0 12px;">เลือก scene<br>เพื่อ preview</div>
+              </div>
+              <div id="vg-s-gen" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;">
+                <div style="position:relative;width:56px;height:56px;">
+                  <svg width="56" height="56" viewBox="0 0 56 56" style="position:absolute;top:0;left:0;">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="3.5"/>
+                    <circle id="vg-ring" cx="28" cy="28" r="22" fill="none" stroke="#21d97a" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="138" stroke-dashoffset="138" transform="rotate(-90 28 28)"/>
+                  </svg>
+                  <div id="vg-ring-pct" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#21d97a;">0%</div>
+                </div>
+                <div id="vg-gen-step" style="font-size:9px;color:rgba(255,255,255,.5);margin-top:8px;">กำลังสร้าง...</div>
+              </div>
+              <div id="vg-s-done" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;z-index:2;">
+                <div style="width:38px;height:38px;border-radius:50%;border:2px solid #21d97a;background:rgba(33,217,122,.15);display:flex;align-items:center;justify-content:center;font-size:16px;color:#21d97a;">✓</div>
+                <div id="vg-done-ttl" style="font-size:10px;color:#21d97a;text-align:center;padding:0 12px;">Ready</div>
+                <div id="vg-done-sub" style="font-size:9px;color:rgba(255,255,255,.4);">8s · 9:16</div>
+              </div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:rgba(0,0,0,.65);display:flex;align-items:center;padding:0 10px;gap:6px;z-index:3;">
+                <div id="vg-pb-dot" style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);flex-shrink:0;"></div>
+                <div style="flex:1;height:2px;background:rgba(255,255,255,.12);border-radius:1px;overflow:hidden;">
+                  <div id="vg-pb-fill" style="height:100%;background:#21d97a;border-radius:1px;width:0%;"></div>
+                </div>
+                <div id="vg-pb-time" style="font-size:8px;color:rgba(255,255,255,.4);">0:08</div>
+              </div>
+            </div>
+            <div style="margin-top:8px;width:155px;">
+              <div id="vg-scene-lbl" style="font-size:11px;color:var(--t2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+              <div id="vg-nav-dots" style="display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap;"></div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:0;" id="vg-scene-col"></div>
+        </div>
+        <div id="vg-log" style="display:none;margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;max-height:90px;overflow-y:auto;">
+          <div id="vg-log-inner" style="font-size:11px;color:var(--t2);font-family:monospace;line-height:1.8;"></div>
+        </div>
+      </div>
+    </div>
 
-      {
-        tag: 's', label: '🛒 POV Unbox', title: 'POV: เปิดกล่องมาแล้วต้องซื้อเพิ่ม', hook: 'Unboxing format CVR 4.83% — format ที่ขายดีที่สุดบน TikTok Shop',
-        story: `HOOK (POV format):\nPOV: ออเดอร์มาแล้ว — เสียงกรรไกรตัดเทป กล่องเปิด tissue กระดาษกรอบ\n\nBUILD-UP (Satisfying demo):\n"ครั้งแรกที่เห็นก็คิดว่าแพง — แต่ $19.99 สำหรับของที่ใช้ทุกวัน?"\n"texture น่าสัมผัส สีตรงปก quality เกินราคา — comment แรก 'link??' ทุกครั้ง"\n"bundle 3 ชิ้น ราคาต่อชิ้นถูกกว่า Starbucks 1 แก้ว — ใครจะไม่ซื้อ"\n\nPAYOFF:\n"TikTok Made Me Buy It — และมันจะทำให้คุณซื้อด้วย ลิงก์ comment อันดับ 1"`
-      },
+  </div><!-- /main-inner -->
+</main>
+</div><!-- /shell -->
 
-      {
-        tag: 's', label: '🛒 Before/After', title: 'ฉันใช้สิ่งนี้ 30 วัน ผลลัพธ์?', hook: 'Before/After format — engagement สูงสุดใน Beauty & Health 2026',
-        story: `HOOK (0-3 วิ ตัดแบบ hard cut):\nซ้าย: ผิวหมอง ขวา: glass skin — ไม่มีคำอธิบาย แค่ภาพเดียว\n\nBUILD-UP (วันที่ 1 → 7 → 30):\n"วันที่ 1 — ไม่เชื่อ ซื้อเพราะ TikTok บอก ราคาไม่แพงถ้าใช้ไม่ได้ก็แค่ทิ้ง"\n"วันที่ 7 — รูขุมขนเล็กลง แต่งหน้าน้อยลง ประหยัดเวลา 15 นาทีต่อเช้า"\n"วันที่ 30 — คนถามว่า filter อะไร — ไม่มี filter"\n\nPAYOFF:\n"ลิงก์ใน bio — ซื้อ 2 ฟรี 1 เฉพาะสัปดาห์นี้ · #skincareroutine #glasskin #tiktokshop"`
-      },
+<script>
+// ─── DATA ──────────────────────────────────────────────────────
+const EXAMPLES=[
+  {tag:'f',label:'Finance',title:'เหตุผลที่คุณยังจน',hook:'นี่คือเหตุผลที่คุณยังจน',
+   story:`HOOK:\n"นี่คือเหตุผลที่คุณยังจน"\n\nBUILD-UP:\n"ไม่ใช่เพราะคุณขี้เกียจ หรือไม่ฉลาดพอ... แต่เพราะไม่มีใครสอนกฎข้อนี้ให้คุณตั้งแต่เด็ก"\n"คนรวยรู้ว่าเงินทำงานได้ คนจนไม่รู้ว่าตัวเองทำงานให้เงิน"\n"ทุกครั้งที่คุณซื้อของที่อยากได้ แทนของที่ต้องการ — คุณกำลังจ่ายภาษีให้คนรวย"\n\nPAYOFF:\n"แต่เพราะคุณคิดแบบนี้ — และมันเปลี่ยนได้ภายใน 30 วัน"`},
+  {tag:'d',label:'Dark Truth',title:'ระบบออกแบบมาให้คุณแพ้',hook:'ระบบการศึกษาสร้างมาเพื่อผลิตลูกจ้าง ไม่ใช่คนรวย',
+   story:`HOOK:\n"ระบบการศึกษาออกแบบมาให้คุณเป็นลูกจ้างที่ดี ไม่ใช่คนรวย"\n\nTWIST:\n"เกรด A ไม่เคยทำให้ใครรวยได้ มันแค่ทำให้คุณเชื่อฟัง"\n"บริษัทที่ใหญ่ที่สุดในโลกสร้างโดยคนที่ dropout"\n"คุณถูกสอนให้ทำงาน... ไม่ถูกสอนให้คิด"\n\nPAYOFF:\n"ถ้าคุณยังเล่นตามกฎของระบบ — คุณจะแพ้ตลอดไป"`},
+  {tag:'m',label:'Mindset',title:'5 นาทีที่เปลี่ยนทุกอย่าง',hook:'คนที่ประสบความสำเร็จทำอะไรตอน 5 โมงเช้า?',
+   story:`HOOK:\n"คนที่ประสบความสำเร็จระดับโลก ทำสิ่งเดียวกันทุกเช้า"\n\nBUILD-UP:\n"ไม่ใช่ cold shower ไม่ใช่ journaling ไม่ใช่ exercise"\n"มันคือ 5 นาทีที่สมองยังไม่ตื่นเต็มที่ — hypnopompic state"\n"ในสถานะนี้ สมองรับข้อมูลได้เร็วกว่าปกติ 3 เท่า"\n\nPAYOFF:\n"ทำสิ่งนี้ 21 วัน — สมองคุณจะไม่เหมือนเดิมอีกต่อไป"`},
+  {tag:'l',label:'Lifestyle',title:'คนรวยจริงๆ ไม่มีใครรู้จัก',hook:'ทำไมคนรวยจริงๆ ไม่อยู่บน Instagram?',
+   story:`HOOK:\n"คนที่คุณเห็น flex บน social — ไม่ใช่คนรวยจริง"\n\nBUILD-UP:\n"คนรวยจริงๆ ไม่มีใครรู้จักชื่อ ไม่มีบน Instagram ไม่ขับ Lambo"\n"พวกเขานั่งในห้องประชุม ตัดสินใจว่าเศรษฐกิจของคุณจะเป็นยังไง"\n"ทุกสิ่งที่คุณถูกสอนให้อยาก — รถ บ้าน นาฬิกา — คือกับดักที่พวกเขาออกแบบ"\n\nPAYOFF:\n"เกมจริงๆ เล่นในที่ที่คุณมองไม่เห็น"`},
+  {tag:'p',label:'Psychology',title:'สมองคุณถูก hack แล้ว',hook:'ทุกแอปที่คุณใช้ออกแบบมาทำลายคุณ',
+   story:`HOOK:\n"Instagram, TikTok, YouTube — ออกแบบโดย neuroscientist เพื่อขโมยเวลาคุณ"\n\nBUILD-UP:\n"slot machine effect — ทุก swipe คือการดึง lever หวัง dopamine"\n"เด็กใน Silicon Valley ไม่ให้ลูกตัวเองใช้ iPad — รู้ว่ามันทำอะไรกับสมอง"\n"ทุก notification คือ interrupt ที่ทำให้ IQ คุณตกชั่วคราว 10 จุด"\n\nPAYOFF:\n"คุณไม่ได้ใช้แอป — แอปกำลังใช้คุณอยู่"`},
+  {tag:'f',label:'Wealth',title:'กฎ 72 ที่โรงเรียนไม่สอน',hook:'เงิน 1 แสน กลายเป็น 2 แสน โดยไม่ทำอะไร',
+   story:`HOOK:\n"มีกฎข้อเดียว ที่ทำให้เงินของคุณเพิ่มเป็น 2 เท่า โดยไม่ต้องทำอะไร"\n\nBUILD-UP:\n"กฎ 72 — หาร 72 ด้วยดอกเบี้ยที่ได้รับ = จำนวนปีที่เงิน x2"\n"ดอกเบี้ยธนาคาร 1% = 72 ปี | S&P500 เฉลี่ย 10% = 7.2 ปี"\n"Einstein เรียกมันว่า สิ่งมหัศจรรย์อันดับ 8 ของโลก"\n\nPAYOFF:\n"ทุกวันที่คุณรอ — คุณกำลังบริจาคเงินอนาคตให้คนอื่น"`},
 
-      {
-        tag: 's', label: '🛒 Companion Sell', title: 'Study With Me + ขายของไปด้วย', hook: 'Companion format — คนเปิดทิ้งไว้ ดู avg 45 วินาที สูงสุดใน 2026',
-        story: `HOOK (ambient, ไม่รีบ):\nโต๊ะสวย — แสงวอร์ม กาแฟกำลังพลุ่ม Lofi เบาๆ — "มาเรียนด้วยกันไหม?"\n\nBUILD-UP (สินค้าปรากฏตามธรรมชาติ):\n"Wireless 3-in-1 Charger วางบนโต๊ะ — โทรศัพท์ Apple Watch AirPods ชาร์จพร้อมกัน ไม่มีสาย"\n"LED Desk Lamp ไม่มีสาย ตั้งที่ไหนก็ได้ — ชาร์จ USB ใช้ได้ 8 ชั่วโมง ตาไม่ล้า"\n"Aesthetic Planner เปิดหน้า to-do — sticker, washi tape, จัดระเบียบชีวิตได้จริง"\n\nPAYOFF (subtle, ไม่ hard sell):\n"ของทุกชิ้นบนโต๊ะ — link in bio พร้อม code 'STUDY15' ลด 15%"`
-      },
-    ];
+  // ── ECOMMERCE / PRODUCT VIRAL ──────────────────────────────────
+  {tag:'s',label:'🛒 Skincare Viral',title:'เซรั่มที่สาวเกาหลีซ่อนไว้',hook:'#SkinTok 9 พันล้าน views — นี่คือตัวที่ทุกคนซื้อ',
+   story:`HOOK (0-3 วิ):\nมือถือสั่น notification เดียว "ของหมดแล้ว" — ภาพ sold out ทั่วทุกร้าน\n\nBUILD-UP:\n"Beauty of Joseon Glow Serum — $17 ขวดเล็ก แต่ขายได้ 8,500 ชิ้นบน TikTok Shop ในเดือนเดียว"\n"สาวเกาหลีใช้มา 10 ปีก่อนมันจะ viral — Glass Skin ไม่ได้แพง มันแค่ถูก formula ที่ใช่"\n"Hyaluronic + Niacinamide + Rice — 3 ตัวนี้ทำงานร่วมกัน ผิวอิ่มน้ำใน 7 วัน ไม่ต้องรีทัช"\n\nPAYOFF:\n"ลิงก์ในไบโอ — stock เหลือ 47 ชิ้น อย่ารอจนหมด"`},
 
-    const TAG_CLASS = { f: 'tg-f', d: 'tg-d', m: 'tg-m', l: 'tg-l', p: 'tg-p', s: 'tg-s' };
+  {tag:'s',label:'🛒 Gadget Drop',title:'ของชิ้นนี้ทำให้ห้องดู $10K',hook:'LED Galaxy Projector — ขาย 10,000 ชิ้นใน 2 สัปดาห์',
+   story:`HOOK (0-2 วิ):\nห้องมืดสนิท → เปิดสวิตช์ → ดาวเต็มเพดาน ASMR เสียง click เดียว\n\nBUILD-UP:\n"LED Galaxy Projector $15 — ปรากฏใน bedroom glow-up videos มากกว่า 2 ล้านคลิป"\n"ไม่ต้องทาสี ไม่ต้องตกแต่งใหม่ — แค่วางตรงมุม แล้วห้องธรรมดากลายเป็น aesthetic ทันที"\n"Gen Z ซื้อเพราะดูดี Gen Alpha ซื้อเพราะ study-with-me — 2 กลุ่มในคลิปเดียว"\n\nPAYOFF + CTA:\n"Swipe up เพื่อดูสีที่เหลือ — จัดส่งใน 3 วัน ฟรีค่าส่งวันนี้เท่านั้น"`},
 
-    // ─── INIT EXAMPLES ─────────────────────────────────────────────
-    (function initExamples() {
-      const gViral = document.getElementById('ex-grid-viral');
-      const gShop = document.getElementById('ex-grid-shop');
-      EXAMPLES.forEach(ex => {
-        const b = document.createElement('button');
-        b.className = 'ex-card';
-        b.innerHTML = `<div class="ex-tag ${TAG_CLASS[ex.tag]}">${ex.label}</div><div class="ex-ttl">${ex.title}</div><div class="ex-hook">${ex.hook}</div>`;
-        b.onclick = () => { setMode('story'); document.getElementById('story-txt').value = ex.story; document.getElementById('story-txt').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
-        (ex.tag === 's' ? gShop : gViral).appendChild(b);
-      });
-    })();
+  {tag:'s',label:'🛒 POV Unbox',title:'POV: เปิดกล่องมาแล้วต้องซื้อเพิ่ม',hook:'Unboxing format CVR 4.83% — format ที่ขายดีที่สุดบน TikTok Shop',
+   story:`HOOK (POV format):\nPOV: ออเดอร์มาแล้ว — เสียงกรรไกรตัดเทป กล่องเปิด tissue กระดาษกรอบ\n\nBUILD-UP (Satisfying demo):\n"ครั้งแรกที่เห็นก็คิดว่าแพง — แต่ $19.99 สำหรับของที่ใช้ทุกวัน?"\n"texture น่าสัมผัส สีตรงปก quality เกินราคา — comment แรก 'link??' ทุกครั้ง"\n"bundle 3 ชิ้น ราคาต่อชิ้นถูกกว่า Starbucks 1 แก้ว — ใครจะไม่ซื้อ"\n\nPAYOFF:\n"TikTok Made Me Buy It — และมันจะทำให้คุณซื้อด้วย ลิงก์ comment อันดับ 1"`},
 
-    // ─── STATE ─────────────────────────────────────────────────────
-    let inputMode = 'youtube', scenes = [], vidGen = {};
+  {tag:'s',label:'🛒 Before/After',title:'ฉันใช้สิ่งนี้ 30 วัน ผลลัพธ์?',hook:'Before/After format — engagement สูงสุดใน Beauty & Health 2026',
+   story:`HOOK (0-3 วิ ตัดแบบ hard cut):\nซ้าย: ผิวหมอง ขวา: glass skin — ไม่มีคำอธิบาย แค่ภาพเดียว\n\nBUILD-UP (วันที่ 1 → 7 → 30):\n"วันที่ 1 — ไม่เชื่อ ซื้อเพราะ TikTok บอก ราคาไม่แพงถ้าใช้ไม่ได้ก็แค่ทิ้ง"\n"วันที่ 7 — รูขุมขนเล็กลง แต่งหน้าน้อยลง ประหยัดเวลา 15 นาทีต่อเช้า"\n"วันที่ 30 — คนถามว่า filter อะไร — ไม่มี filter"\n\nPAYOFF:\n"ลิงก์ใน bio — ซื้อ 2 ฟรี 1 เฉพาะสัปดาห์นี้ · #skincareroutine #glasskin #tiktokshop"`},
 
-    function updateMeta() {
-      const s = document.getElementById('style-sel').value;
-      const l = document.getElementById('lang-sel').value;
-      document.getElementById('pg-meta').innerHTML = `Style: <b>${s}</b> · <b>3 scenes × 10s = 30s</b> · Language: <b>${l}</b> · TikTok / Reels / Shorts`;
-    }
+  {tag:'s',label:'🛒 Companion Sell',title:'Study With Me + ขายของไปด้วย',hook:'Companion format — คนเปิดทิ้งไว้ ดู avg 45 วินาที สูงสุดใน 2026',
+   story:`HOOK (ambient, ไม่รีบ):\nโต๊ะสวย — แสงวอร์ม กาแฟกำลังพลุ่ม Lofi เบาๆ — "มาเรียนด้วยกันไหม?"\n\nBUILD-UP (สินค้าปรากฏตามธรรมชาติ):\n"Wireless 3-in-1 Charger วางบนโต๊ะ — โทรศัพท์ Apple Watch AirPods ชาร์จพร้อมกัน ไม่มีสาย"\n"LED Desk Lamp ไม่มีสาย ตั้งที่ไหนก็ได้ — ชาร์จ USB ใช้ได้ 8 ชั่วโมง ตาไม่ล้า"\n"Aesthetic Planner เปิดหน้า to-do — sticker, washi tape, จัดระเบียบชีวิตได้จริง"\n\nPAYOFF (subtle, ไม่ hard sell):\n"ของทุกชิ้นบนโต๊ะ — link in bio พร้อม code 'STUDY15' ลด 15%"`},
+];
 
-    function setMode(m) {
-      inputMode = m;
-      document.getElementById('mode-yt').style.display = m === 'youtube' ? 'block' : 'none';
-      document.getElementById('mode-story').style.display = m === 'story' ? 'block' : 'none';
-      document.getElementById('tab-yt').className = 'ttab' + (m === 'youtube' ? ' active' : '');
-      document.getElementById('tab-story').className = 'ttab' + (m === 'story' ? ' active' : '');
-    }
+const TAG_CLASS={f:'tg-f',d:'tg-d',m:'tg-m',l:'tg-l',p:'tg-p',s:'tg-s'};
 
-    // ─── PAGE SWITCH ───────────────────────────────────────────────
-    function switchPage(p) {
-      document.getElementById('page-scene').style.display = p === 'scene' ? 'block' : 'none';
-      document.getElementById('page-vidgen').style.display = p === 'vidgen' ? 'block' : 'none';
-      document.getElementById('nav-scene').className = 'nav-i' + (p === 'scene' ? ' active' : '');
-      document.getElementById('nav-vidgen').className = 'nav-i' + (p === 'vidgen' ? ' active' : '');
-      if (p === 'vidgen') renderVGPage();
-      closeDrawer();
-    }
+// ─── INIT EXAMPLES ─────────────────────────────────────────────
+(function initExamples(){
+  const gViral=document.getElementById('ex-grid-viral');
+  const gShop=document.getElementById('ex-grid-shop');
+  EXAMPLES.forEach(ex=>{
+    const b=document.createElement('button');
+    b.className='ex-card';
+    b.innerHTML=`<div class="ex-tag ${TAG_CLASS[ex.tag]}">${ex.label}</div><div class="ex-ttl">${ex.title}</div><div class="ex-hook">${ex.hook}</div>`;
+    b.onclick=()=>{setMode('story');document.getElementById('story-txt').value=ex.story;document.getElementById('story-txt').scrollIntoView({behavior:'smooth',block:'nearest'});};
+    (ex.tag==='s'?gShop:gViral).appendChild(b);
+  });
+})();
 
-    // ─── DRAWER ────────────────────────────────────────────────────
-    function openDrawer() {
-      const sb = document.getElementById('sidebar');
-      sb.classList.add('drawer', 'open');
-      document.getElementById('drawer-overlay').classList.add('open');
-    }
-    function closeDrawer() {
-      const sb = document.getElementById('sidebar');
-      sb.classList.remove('open');
-      document.getElementById('drawer-overlay').classList.remove('open');
-      setTimeout(() => sb.classList.remove('drawer'), 300);
-    }
+// ─── STATE ─────────────────────────────────────────────────────
+let inputMode='youtube', scenes=[], vidGen={};
 
-    // ─── ERROR ─────────────────────────────────────────────────────
-    function showErr(m) { const e = document.getElementById('err-box'); e.textContent = m; e.style.display = 'block'; }
-    function hideErr() { document.getElementById('err-box').style.display = 'none'; }
+function updateMeta(){
+  const s=document.getElementById('style-sel').value;
+  const l=document.getElementById('lang-sel').value;
+  document.getElementById('pg-meta').innerHTML=`Style: <b>${s}</b> · <b>3 scenes × 10s = 30s</b> · Language: <b>${l}</b> · TikTok / Reels / Shorts`;
+}
 
-    // ─── REFERENCE IMAGE ───────────────────────────────────────────
-    let refImgB64 = '', refImgType = 'character';
+function setMode(m){
+  inputMode=m;
+  document.getElementById('mode-yt').style.display=m==='youtube'?'block':'none';
+  document.getElementById('mode-story').style.display=m==='story'?'block':'none';
+  document.getElementById('tab-yt').className='ttab'+(m==='youtube'?' active':'');
+  document.getElementById('tab-story').className='ttab'+(m==='story'?' active':'');
+}
 
-    function handleRefImg(input) {
-      if (!input.files[0]) return;
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = e => {
-        refImgB64 = e.target.result.split(',')[1];
-        const url = e.target.result;
-        document.getElementById('ref-img').src = url;
-        document.getElementById('ref-fn').textContent = '✓ ' + file.name;
-        document.getElementById('ref-preview').style.display = 'flex';
-        document.getElementById('ref-drop').style.display = 'none';
-        document.getElementById('ref-clear').style.display = 'block';
-        setRefMode('character');
-      };
-      reader.readAsDataURL(file);
-    }
+// ─── PAGE SWITCH ───────────────────────────────────────────────
+function switchPage(p){
+  document.getElementById('page-scene').style.display=p==='scene'?'block':'none';
+  document.getElementById('page-vidgen').style.display=p==='vidgen'?'block':'none';
+  document.getElementById('nav-scene').className='nav-i'+(p==='scene'?' active':'');
+  document.getElementById('nav-vidgen').className='nav-i'+(p==='vidgen'?' active':'');
+  if(p==='vidgen') renderVGPage();
+  closeDrawer();
+}
 
-    function setRefMode(mode) {
-      refImgType = mode;
-      const c = document.getElementById('ref-mode-char');
-      const p = document.getElementById('ref-mode-prod');
-      const tip = document.getElementById('ref-tip');
-      if (mode === 'character') {
-        c.style.cssText = 'font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,176,32,.4);color:var(--amber);background:rgba(255,176,32,.12);';
-        p.style.cssText = 'font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--t2);';
-        tip.textContent = 'Image นี้จะถูกส่งเป็น first frame ทุก scene → ตัวละครหน้าตาเดิมทุกช็อต (ใช้กับ Kling Image-to-Video)';
-      } else {
-        p.style.cssText = 'font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,176,32,.4);color:var(--amber);background:rgba(255,176,32,.12);';
-        c.style.cssText = 'font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--t2);';
-        tip.textContent = 'Prompt ทุก scene จะ reference รูปสินค้านี้ → สี shape packaging consistent ทุกช็อต';
-      }
-    }
+// ─── DRAWER ────────────────────────────────────────────────────
+function openDrawer(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.add('drawer','open');
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+function closeDrawer(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  setTimeout(()=>sb.classList.remove('drawer'),300);
+}
 
-    function clearRefImg() {
-      refImgB64 = '';
-      document.getElementById('ref-img').src = '';
-      document.getElementById('ref-fi').value = '';
-      document.getElementById('ref-fn').textContent = 'อัปโหลด reference image (ตัวละคร / สินค้า)';
-      document.getElementById('ref-preview').style.display = 'none';
-      document.getElementById('ref-drop').style.display = 'flex';
-      document.getElementById('ref-clear').style.display = 'none';
-    }
+// ─── ERROR ─────────────────────────────────────────────────────
+function showErr(m){const e=document.getElementById('err-box');e.textContent=m;e.style.display='block';}
+function hideErr(){document.getElementById('err-box').style.display='none';}
 
-    // ─── API KEYS (in-memory, no localStorage) ────────────────────
-    let _claudeKey = '', _klingKey = '', _workerUrl = '';
+// ─── REFERENCE IMAGE ───────────────────────────────────────────
+let refImgB64='', refImgType='character';
 
-    function getClaudeKey() {
-      return document.getElementById('claude-key-inp')?.value?.trim() || _claudeKey;
-    }
-    function getKlingKey() {
-      const inp = document.getElementById('kling-key-inp') || document.getElementById('kling-key-top');
-      return inp?.value?.trim() || _klingKey;
-    }
-    function getWorkerUrl() {
-      const inp = document.getElementById('worker-url-inp') || document.getElementById('worker-url-top');
-      return (inp?.value?.trim() || _workerUrl).replace(/\/+$/, '');
-    }
+function handleRefImg(input){
+  if(!input.files[0]) return;
+  const file=input.files[0];
+  const reader=new FileReader();
+  reader.onload=e=>{
+    refImgB64=e.target.result.split(',')[1];
+    const url=e.target.result;
+    document.getElementById('ref-img').src=url;
+    document.getElementById('ref-fn').textContent='✓ '+file.name;
+    document.getElementById('ref-preview').style.display='flex';
+    document.getElementById('ref-drop').style.display='none';
+    document.getElementById('ref-clear').style.display='block';
+    setRefMode('character');
+  };
+  reader.readAsDataURL(file);
+}
 
-    function syncKlingKey(val) {
-      _klingKey = val.trim();
-      const other = document.getElementById('kling-key-inp');
-      if (other && other.value !== val) other.value = val;
-      const dot = document.getElementById('kling-dot-top');
-      if (dot) dot.style.background = val.length > 10 ? '#21d97a' : 'var(--t3)';
-    }
-    function syncWorkerUrl(val) {
-      _workerUrl = val.trim().replace(/\/+$/, '');
-      const other = document.getElementById('worker-url-inp');
-      if (other && other.value !== val) other.value = val;
-    }
+function setRefMode(mode){
+  refImgType=mode;
+  const c=document.getElementById('ref-mode-char');
+  const p=document.getElementById('ref-mode-prod');
+  const tip=document.getElementById('ref-tip');
+  if(mode==='character'){
+    c.style.cssText='font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,176,32,.4);color:var(--amber);background:rgba(255,176,32,.12);';
+    p.style.cssText='font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--t2);';
+    tip.textContent='Image นี้จะถูกส่งเป็น first frame ทุก scene → ตัวละครหน้าตาเดิมทุกช็อต (ใช้กับ Kling Image-to-Video)';
+  } else {
+    p.style.cssText='font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid rgba(255,176,32,.4);color:var(--amber);background:rgba(255,176,32,.12);';
+    c.style.cssText='font-size:10px;padding:3px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--t2);';
+    tip.textContent='Prompt ทุก scene จะ reference รูปสินค้านี้ → สี shape packaging consistent ทุกช็อต';
+  }
+}
 
-    function checkClaudeKey() {
-      const k = document.getElementById('claude-key-inp')?.value?.trim() || '';
-      _claudeKey = k;
-      const dot = document.getElementById('claude-dot');
-      const ok = k.startsWith('sk-ant-') || k.length > 20;
-      if (dot) dot.style.background = ok ? '#21d97a' : k.length > 5 ? '#ffb020' : 'var(--t3)';
-      const status = document.getElementById('keys-status');
-      if (status) status.textContent = ok ? '✓ Claude Key พร้อม — เลือก template แล้วกด วิเคราะห์ได้เลย' : 'ใส่ Claude API Key เพื่อเริ่มสร้าง scenes';
-      if (status) status.style.color = ok ? 'var(--acc)' : 'var(--t3)';
-    }
-    function checkKlingKey() {
-      const k = document.getElementById('kling-key-inp')?.value?.trim() || '';
-      const dot = document.getElementById('kling-dot');
-      const status = document.getElementById('kling-key-status');
-      const ok = k.length > 10;
-      if (dot) dot.style.background = ok ? '#21d97a' : 'var(--t3)';
-      if (status) status.style.display = ok ? 'block' : 'none';
-    }
-    function toggleClaudeVis() {
-      const inp = document.getElementById('claude-key-inp');
-      const btn = document.getElementById('claude-vis-btn');
-      if (!inp) return;
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-      if (btn) btn.textContent = inp.type === 'password' ? 'show' : 'hide';
-    }
-    function toggleKlingVis() {
-      const inp = document.getElementById('kling-key-inp');
-      const btn = document.getElementById('kling-vis-btn');
-      if (!inp) return;
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-      if (btn) btn.textContent = inp.type === 'password' ? 'show' : 'hide';
-    }
+function clearRefImg(){
+  refImgB64='';
+  document.getElementById('ref-img').src='';
+  document.getElementById('ref-fi').value='';
+  document.getElementById('ref-fn').textContent='อัปโหลด reference image (ตัวละคร / สินค้า)';
+  document.getElementById('ref-preview').style.display='none';
+  document.getElementById('ref-drop').style.display='flex';
+  document.getElementById('ref-clear').style.display='none';
+}
 
-    // ─── ANALYZE ───────────────────────────────────────────────────
-    async function analyze() {
-      hideErr();
-      let input = '';
-      if (inputMode === 'youtube') {
-        input = document.getElementById('yt-url').value.trim();
-        if (!input) { showErr('⚠️ กรุณาใส่ YouTube URL'); return; }
-      } else {
-        input = document.getElementById('story-txt').value.trim();
-        if (!input) { showErr('⚠️ กรุณาเขียน Story'); return; }
-      }
-      const style = document.getElementById('style-sel').value;
-      const lang = document.getElementById('lang-sel').value;
+// ─── API KEYS (in-memory, no localStorage) ────────────────────
+let _claudeKey='', _klingKey='', _workerUrl='';
 
-      document.getElementById('analyze-btn').disabled = true;
-      document.getElementById('empty').style.display = 'none';
-      document.getElementById('results').style.display = 'none';
-      document.getElementById('loading').style.display = 'block';
+function getClaudeKey(){
+  return document.getElementById('claude-key-inp')?.value?.trim() || _claudeKey;
+}
+function getKlingKey(){
+  const inp=document.getElementById('kling-key-inp')||document.getElementById('kling-key-top');
+  return inp?.value?.trim() || _klingKey;
+}
+function getWorkerUrl(){
+  const inp=document.getElementById('worker-url-inp')||document.getElementById('worker-url-top');
+  return (inp?.value?.trim()||_workerUrl).replace(/\/+$/,'');
+}
 
-      const msgs = ['กำลังวิเคราะห์เนื้อหา...', 'กำลังแตก scenes...', 'สร้าง prompts...', 'เกือบเสร็จแล้ว...'];
-      let mi = 0;
-      const mel = document.getElementById('load-msg');
-      const iv = setInterval(() => { mi = (mi + 1) % msgs.length; mel.textContent = msgs[mi]; }, 1800);
+function syncKlingKey(val){
+  _klingKey=val.trim();
+  const other=document.getElementById('kling-key-inp');
+  if(other&&other.value!==val) other.value=val;
+  const dot=document.getElementById('kling-dot-top');
+  if(dot) dot.style.background=val.length>10?'#21d97a':'var(--t3)';
+}
+function syncWorkerUrl(val){
+  _workerUrl=val.trim().replace(/\/+$/,'');
+  const other=document.getElementById('worker-url-inp');
+  if(other&&other.value!==val) other.value=val;
+}
 
-      const refHint = refImgB64
-        ? refImgType === 'character'
-          ? `\n- A reference image of the CHARACTER is provided. Every scene's img_prompt and video_prompt MUST describe this exact person consistently: same face, hair, clothing style. Add "use provided reference image as first frame" to every video_prompt.`
-          : `\n- A reference image of the PRODUCT is provided. Every scene's img_prompt and video_prompt MUST describe this exact product consistently: same shape, color, packaging, label. Add "use provided reference image as first frame" to every video_prompt.`
-        : '';
+function checkClaudeKey(){
+  const k=document.getElementById('claude-key-inp')?.value?.trim()||'';
+  _claudeKey=k;
+  const dot=document.getElementById('claude-dot');
+  const ok=k.startsWith('sk-ant-')||k.length>20;
+  if(dot) dot.style.background=ok?'#21d97a':k.length>5?'#ffb020':'var(--t3)';
+  const status=document.getElementById('keys-status');
+  if(status) status.textContent=ok?'✓ Claude Key พร้อม — เลือก template แล้วกด วิเคราะห์ได้เลย':'ใส่ Claude API Key เพื่อเริ่มสร้าง scenes';
+  if(status) status.style.color=ok?'var(--acc)':'var(--t3)';
+}
+function checkKlingKey(){
+  const k=document.getElementById('kling-key-inp')?.value?.trim()||'';
+  const dot=document.getElementById('kling-dot');
+  const status=document.getElementById('kling-key-status');
+  const ok=k.length>10;
+  if(dot) dot.style.background=ok?'#21d97a':'var(--t3)';
+  if(status) status.style.display=ok?'block':'none';
+}
+function toggleClaudeVis(){
+  const inp=document.getElementById('claude-key-inp');
+  const btn=document.getElementById('claude-vis-btn');
+  if(!inp) return;
+  inp.type=inp.type==='password'?'text':'password';
+  if(btn) btn.textContent=inp.type==='password'?'show':'hide';
+}
+function toggleKlingVis(){
+  const inp=document.getElementById('kling-key-inp');
+  const btn=document.getElementById('kling-vis-btn');
+  if(!inp) return;
+  inp.type=inp.type==='password'?'text':'password';
+  if(btn) btn.textContent=inp.type==='password'?'show':'hide';
+}
 
-      const sys = `You are a viral short-form video scene planner for TikTok/Reels/Shorts.
+// ─── ANALYZE ───────────────────────────────────────────────────
+async function analyze(){
+  hideErr();
+  let input='';
+  if(inputMode==='youtube'){
+    input=document.getElementById('yt-url').value.trim();
+    if(!input){showErr('⚠️ กรุณาใส่ YouTube URL');return;}
+  } else {
+    input=document.getElementById('story-txt').value.trim();
+    if(!input){showErr('⚠️ กรุณาเขียน Story');return;}
+  }
+  const style=document.getElementById('style-sel').value;
+  const lang=document.getElementById('lang-sel').value;
+
+  document.getElementById('analyze-btn').disabled=true;
+  document.getElementById('empty').style.display='none';
+  document.getElementById('results').style.display='none';
+  document.getElementById('loading').style.display='block';
+
+  const msgs=['กำลังวิเคราะห์เนื้อหา...','กำลังแตก scenes...','สร้าง prompts...','เกือบเสร็จแล้ว...'];
+  let mi=0;
+  const mel=document.getElementById('load-msg');
+  const iv=setInterval(()=>{mi=(mi+1)%msgs.length;mel.textContent=msgs[mi];},1800);
+
+  const refHint = refImgB64
+    ? refImgType==='character'
+      ? `\n- A reference image of the CHARACTER is provided. Every scene's img_prompt and video_prompt MUST describe this exact person consistently: same face, hair, clothing style. Add "use provided reference image as first frame" to every video_prompt.`
+      : `\n- A reference image of the PRODUCT is provided. Every scene's img_prompt and video_prompt MUST describe this exact product consistently: same shape, color, packaging, label. Add "use provided reference image as first frame" to every video_prompt.`
+    : '';
+
+  const sys=`You are a viral short-form video scene planner for TikTok/Reels/Shorts.
 Target: EXACTLY 3 scenes, each 10 seconds = 30 seconds total. No more, no less.
 Structure: Scene 1 = HOOK (grab attention in 3s), Scene 2 = BUILD-UP (conflict/value), Scene 3 = PAYOFF + CTA.
 
@@ -1906,141 +773,139 @@ Additional rules:
 - Scene 3: clear call-to-action.
 - NEVER use the " character inside string values. It breaks JSON parsing.${refHint}`;
 
-      // Build message content — include image if provided
-      const userContent = refImgB64
-        ? [
-          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: refImgB64 } },
-          {
-            type: 'text', text: inputMode === 'youtube'
-              ? `Reference image above. Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
-              : `Reference image above. Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`
-          }
-        ]
-        : inputMode === 'youtube'
-          ? `Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
-          : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
+  // Build message content — include image if provided
+  const userContent = refImgB64
+    ? [
+        { type:'image', source:{ type:'base64', media_type:'image/jpeg', data: refImgB64 } },
+        { type:'text', text: inputMode==='youtube'
+            ? `Reference image above. Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
+            : `Reference image above. Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}` }
+      ]
+    : inputMode==='youtube'
+      ? `Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
+      : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
 
-      try {
-        const claudeKey = getClaudeKey();
-        const headers = {
-          'Content-Type': 'application/json',
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        };
-        if (claudeKey) headers['x-api-key'] = claudeKey;
+  try{
+    const claudeKey = getClaudeKey();
+    const headers = {
+      'Content-Type':'application/json',
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    };
+    if(claudeKey) headers['x-api-key'] = claudeKey;
 
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, system: sys, messages: [{ role: 'user', content: userContent }] })
-        });
-        if (!res.ok) {
-          const e = await res.json().catch(() => ({}));
-          throw new Error(e.error?.message || `HTTP ${res.status} — ตรวจสอบ API key หรือ network`);
-        }
-        const data = await res.json();
-        clearInterval(iv);
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers,
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:userContent}]})
+    });
+    if(!res.ok){
+      const e=await res.json().catch(()=>({}));
+      throw new Error(e.error?.message||`HTTP ${res.status} — ตรวจสอบ API key หรือ network`);
+    }
+    const data=await res.json();
+    clearInterval(iv);
 
-        // extract text from all content blocks
-        const raw = data.content
-          .filter(b => b.type === 'text')
-          .map(b => b.text || '')
-          .join('')
-          .trim();
+    // extract text from all content blocks
+    const raw = data.content
+      .filter(b=>b.type==='text')
+      .map(b=>b.text||'')
+      .join('')
+      .trim();
 
-        if (!raw) throw new Error('Claude ตอบกลับมาว่าง — ลองใหม่อีกครั้ง');
+    if(!raw) throw new Error('Claude ตอบกลับมาว่าง — ลองใหม่อีกครั้ง');
 
-        // strip markdown fences
-        let clean = raw
-          .replace(/^```json[\s\n]*/i, '')
-          .replace(/^```[\s\n]*/, '')
-          .replace(/[\s\n]*```$/, '')
-          .trim();
+    // strip markdown fences
+    let clean = raw
+      .replace(/^```json[\s\n]*/i,'')
+      .replace(/^```[\s\n]*/,'')
+      .replace(/[\s\n]*```$/,'')
+      .trim();
 
-        // find JSON array boundaries
-        const start = clean.indexOf('[');
-        const end = clean.lastIndexOf(']');
-        if (start === -1 || end === -1) throw new Error(`ไม่พบ JSON array — Claude ตอบ: "${clean.slice(0, 120)}"`);
-        clean = clean.slice(start, end + 1);
+    // find JSON array boundaries
+    const start = clean.indexOf('[');
+    const end = clean.lastIndexOf(']');
+    if(start===-1||end===-1) throw new Error(`ไม่พบ JSON array — Claude ตอบ: "${clean.slice(0,120)}"`);
+    clean = clean.slice(start, end+1);
 
-        // sanitize: replace unescaped double-quotes inside string values
-        // Strategy: use a safer parse by fixing common Thai text issues
-        const sanitized = clean
-          .replace(/[\u201C\u201D]/g, '\\"')   // smart quotes → escaped
-          .replace(/[\u2018\u2019]/g, "'");     // smart single quotes → plain
+    // sanitize: replace unescaped double-quotes inside string values
+    // Strategy: use a safer parse by fixing common Thai text issues
+    const sanitized = clean
+      .replace(/[\u201C\u201D]/g,'\\"')   // smart quotes → escaped
+      .replace(/[\u2018\u2019]/g,"'");     // smart single quotes → plain
 
-        let parsed;
-        try {
-          parsed = JSON.parse(sanitized);
-        } catch (e1) {
-          // fallback: try to extract each scene object individually
-          try {
-            const matches = sanitized.match(/\{[^{}]*"scene_num"[^{}]*\}/g);
-            if (matches && matches.length > 0) {
-              parsed = matches.map(m => {
-                try { return JSON.parse(m); } catch (e) {
-                  // last resort: eval-style extraction of key fields
-                  const get = (key) => {
-                    const r = new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`)
-                    const m2 = m.match(r);
-                    return m2 ? m2[1] : '';
-                  };
-                  return {
-                    scene_num: parseInt(m.match(/"scene_num"\s*:\s*(\d+)/)?.[1] || '0'),
-                    title: get('title'),
-                    story_beat: get('story_beat'),
-                    img_prompt: get('img_prompt'),
-                    video_prompt: get('video_prompt')
-                  };
-                }
-              }).filter(s => s.scene_num > 0);
+    let parsed;
+    try{
+      parsed = JSON.parse(sanitized);
+    }catch(e1){
+      // fallback: try to extract each scene object individually
+      try{
+        const matches = sanitized.match(/\{[^{}]*"scene_num"[^{}]*\}/g);
+        if(matches&&matches.length>0){
+          parsed = matches.map(m=>{
+            try{return JSON.parse(m);}catch(e){
+              // last resort: eval-style extraction of key fields
+              const get=(key)=>{
+                const r=new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`)
+                const m2=m.match(r);
+                return m2?m2[1]:'';
+              };
+              return {
+                scene_num:parseInt(m.match(/"scene_num"\s*:\s*(\d+)/)?.[1]||'0'),
+                title:get('title'),
+                story_beat:get('story_beat'),
+                img_prompt:get('img_prompt'),
+                video_prompt:get('video_prompt')
+              };
             }
-            if (!parsed || parsed.length === 0) throw new Error('extract failed');
-          } catch (e2) {
-            throw new Error(`JSON parse error: ${e1.message.slice(0, 80)} — raw: "${clean.slice(0, 120)}"`);
-          }
+          }).filter(s=>s.scene_num>0);
         }
-
-        if (!Array.isArray(parsed) || parsed.length === 0) {
-          throw new Error('ได้รับข้อมูลไม่ถูกต้อง — ลองใหม่อีกครั้ง');
-        }
-
-        scenes = parsed;
-        vidGen = {};
-        vgStates = scenes.map(() => 'pending');
-        vgLogLines = [];
-        renderScenes(scenes);
-      } catch (err) {
-        clearInterval(iv);
-        showErr('❌ ' + err.message);
-        document.getElementById('empty').style.display = 'block';
-      } finally {
-        clearInterval(iv);
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('analyze-btn').disabled = false;
+        if(!parsed||parsed.length===0) throw new Error('extract failed');
+      }catch(e2){
+        throw new Error(`JSON parse error: ${e1.message.slice(0,80)} — raw: "${clean.slice(0,120)}"`);
       }
     }
 
-    // ─── RENDER SCENES ─────────────────────────────────────────────
-    function renderScenes(sc) {
-      document.getElementById('sc-count').textContent = sc.length + ' scenes';
-      // show ref image badge if set
-      const refBadge = refImgB64
-        ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.25);color:var(--amber);margin-bottom:10px;">
+    if(!Array.isArray(parsed)||parsed.length===0){
+      throw new Error('ได้รับข้อมูลไม่ถูกต้อง — ลองใหม่อีกครั้ง');
+    }
+
+    scenes = parsed;
+    vidGen={};
+    vgStates=scenes.map(()=>'pending');
+    vgLogLines=[];
+    renderScenes(scenes);
+  }catch(err){
+    clearInterval(iv);
+    showErr('❌ '+err.message);
+    document.getElementById('empty').style.display='block';
+  }finally{
+    clearInterval(iv);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('analyze-btn').disabled=false;
+  }
+}
+
+// ─── RENDER SCENES ─────────────────────────────────────────────
+function renderScenes(sc){
+  document.getElementById('sc-count').textContent=sc.length+' scenes';
+  // show ref image badge if set
+  const refBadge = refImgB64
+    ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.25);color:var(--amber);margin-bottom:10px;">
         <img src="${document.getElementById('ref-img').src}" style="width:16px;height:16px;border-radius:3px;object-fit:cover;">
-        Reference ${refImgType === 'character' ? '👤 ตัวละคร' : '📦 สินค้า'} — ส่งเป็น first frame ทุก scene
+        Reference ${refImgType==='character'?'👤 ตัวละคร':'📦 สินค้า'} — ส่งเป็น first frame ทุก scene
        </div>`
-        : '';
-      document.getElementById('sc-list').insertAdjacentHTML('beforebegin', refBadge ? `<div id="ref-badge-row">${refBadge}</div>` : '');
-      const list = document.getElementById('sc-list'); list.innerHTML = '';
-      const oldBadge = document.getElementById('ref-badge-row');
-      if (oldBadge) oldBadge.remove();
-      sc.forEach((s, i) => {
-        const el = document.createElement('div');
-        el.className = 'sc-card'; el.id = 'sc' + i;
-        el.innerHTML = `
+    : '';
+  document.getElementById('sc-list').insertAdjacentHTML('beforebegin', refBadge ? `<div id="ref-badge-row">${refBadge}</div>` : '');
+  const list=document.getElementById('sc-list');list.innerHTML='';
+  const oldBadge=document.getElementById('ref-badge-row');
+  if(oldBadge) oldBadge.remove();
+  sc.forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className='sc-card';el.id='sc'+i;
+    el.innerHTML=`
       <div class="sc-hdr" onclick="tog(${i})">
-        <span class="sc-num">SCENE ${String(s.scene_num).padStart(2, '0')}</span>
+        <span class="sc-num">SCENE ${String(s.scene_num).padStart(2,'0')}</span>
         <span class="sc-ttl">${s.title}</span>
         <span class="chev" id="chev${i}">›</span>
       </div>
@@ -2050,386 +915,385 @@ Additional rules:
         <div class="pb"><div class="pt">Video Prompt <button class="cp-btn" onclick="cp('vpt${i}',this)">copy</button></div><div class="pr-txt" id="vpt${i}">${s.video_prompt}</div></div>
         <button class="gen-btn" onclick="switchPage('vidgen')">✨ ไป Video Generation →</button>
       </div>`;
-        list.appendChild(el);
-      });
-      document.getElementById('results').style.display = 'block';
-    }
+    list.appendChild(el);
+  });
+  document.getElementById('results').style.display='block';
+}
 
-    function tog(i) {
-      const b = document.getElementById('body' + i);
-      const c = document.getElementById('chev' + i);
-      const card = document.getElementById('sc' + i);
-      const open = b.classList.toggle('open');
-      c.classList.toggle('open', open);
-      card.classList.toggle('open', open);
-    }
+function tog(i){
+  const b=document.getElementById('body'+i);
+  const c=document.getElementById('chev'+i);
+  const card=document.getElementById('sc'+i);
+  const open=b.classList.toggle('open');
+  c.classList.toggle('open',open);
+  card.classList.toggle('open',open);
+}
 
-    function cp(id, btn) {
-      navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-        const orig = btn.textContent; btn.textContent = 'copied!'; btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
-      });
-    }
+function cp(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    const orig=btn.textContent;btn.textContent='copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},1800);
+  });
+}
 
-    // ─── VIDEO GENERATION (mock workflow) ─────────────────────────
-    let vgStates = [], vgSelected = -1, vgDisplay = -1, vgTimers = [], vgLogLines = [];
-    const VG_STEPS = ['ส่ง prompt ไป AI...', 'กำลังประมวลผล...', 'Rendering frames...', 'Encoding 9:16...', 'เกือบเสร็จแล้ว...'];
+// ─── VIDEO GENERATION (mock workflow) ─────────────────────────
+let vgStates=[], vgSelected=-1, vgDisplay=-1, vgTimers=[], vgLogLines=[];
+const VG_STEPS=['ส่ง prompt ไป AI...','กำลังประมวลผล...','Rendering frames...','Encoding 9:16...','เกือบเสร็จแล้ว...'];
 
-    function vgBar() { return `<div style="flex:1;background:#21d97a;border-radius:1px 1px 0 0;height:${15 + Math.random() * 70}%;opacity:.5;"></div>`; }
+function vgBar(){return `<div style="flex:1;background:#21d97a;border-radius:1px 1px 0 0;height:${15+Math.random()*70}%;opacity:.5;"></div>`;}
 
-    function vgInitPhoneBars() {
-      document.getElementById('vg-phone-bars').innerHTML = Array.from({ length: 12 }, vgBar).join('');
-    }
+function vgInitPhoneBars(){
+  document.getElementById('vg-phone-bars').innerHTML=Array.from({length:12},vgBar).join('');
+}
 
-    function vgStatCard(label, val, color) {
-      return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;">
+function vgStatCard(label,val,color){
+  return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;">
     <div style="font-size:10px;color:var(--t3);margin-bottom:3px;">${label}</div>
-    <div style="font-size:18px;font-weight:600;color:${color || 'var(--txt)'};">${val}</div>
+    <div style="font-size:18px;font-weight:600;color:${color||'var(--txt)'};">${val}</div>
   </div>`;
-    }
+}
 
-    function vgUpdateStats() {
-      const done = vgStates.filter(s => s === 'done').length;
-      const gen = vgStates.filter(s => s === 'generating').length;
-      const pending = vgStates.filter(s => s === 'pending').length;
-      document.getElementById('vg-stats').innerHTML =
-        vgStatCard('Total scenes', scenes.length) +
-        vgStatCard('Generated', done, '#21d97a') +
-        vgStatCard('In queue', gen, '#ffb020') +
-        vgStatCard('Est. time', done === scenes.length ? 'Done ✓' : `~${pending * 9}s`);
-    }
+function vgUpdateStats(){
+  const done=vgStates.filter(s=>s==='done').length;
+  const gen=vgStates.filter(s=>s==='generating').length;
+  const pending=vgStates.filter(s=>s==='pending').length;
+  document.getElementById('vg-stats').innerHTML=
+    vgStatCard('Total scenes',scenes.length)+
+    vgStatCard('Generated',done,'#21d97a')+
+    vgStatCard('In queue',gen,'#ffb020')+
+    vgStatCard('Est. time',done===scenes.length?'Done ✓':`~${pending*9}s`);
+}
 
-    function vgAddLog(msg, accent) {
-      const t = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      vgLogLines.push(`<span style="color:${accent ? '#21d97a' : 'var(--t2)'}">[${t}] ${msg}</span>`);
-      if (vgLogLines.length > 15) vgLogLines.shift();
-      const el = document.getElementById('vg-log-inner');
-      el.innerHTML = vgLogLines.join('<br>');
-      document.getElementById('vg-log').style.display = 'block';
-      document.getElementById('vg-log').scrollTop = 9999;
-    }
+function vgAddLog(msg,accent){
+  const t=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  vgLogLines.push(`<span style="color:${accent?'#21d97a':'var(--t2)'}">[${t}] ${msg}</span>`);
+  if(vgLogLines.length>15) vgLogLines.shift();
+  const el=document.getElementById('vg-log-inner');
+  el.innerHTML=vgLogLines.join('<br>');
+  document.getElementById('vg-log').style.display='block';
+  document.getElementById('vg-log').scrollTop=9999;
+}
 
-    function vgShowPhone(i) {
-      vgDisplay = i;
-      const s = scenes[i];
-      document.getElementById('vg-scene-lbl').textContent = `Scene ${s.scene_num} · ${s.title}`;
-      ['vg-s-idle', 'vg-s-gen', 'vg-s-done'].forEach(id => document.getElementById(id).style.display = 'none');
-      document.querySelectorAll('.vg-navdot').forEach((d, j) => d.style.background = j === i ? '#21d97a' : 'var(--t3)');
+function vgShowPhone(i){
+  vgDisplay=i;
+  const s=scenes[i];
+  document.getElementById('vg-scene-lbl').textContent=`Scene ${s.scene_num} · ${s.title}`;
+  ['vg-s-idle','vg-s-gen','vg-s-done'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelectorAll('.vg-navdot').forEach((d,j)=>d.style.background=j===i?'#21d97a':'var(--t3)');
 
-      if (vgStates[i] === 'pending') {
-        document.getElementById('vg-s-idle').style.display = 'flex';
-        document.getElementById('vg-idle-txt').textContent = `${s.title}`;
-        document.getElementById('vg-pb-dot').style.background = 'rgba(255,255,255,.25)';
-        document.getElementById('vg-pb-fill').style.width = '0%';
-        document.getElementById('vg-pb-time').textContent = '0:10';
-      } else if (vgStates[i] === 'generating') {
-        document.getElementById('vg-s-gen').style.display = 'flex';
-      } else if (vgStates[i] === 'done') {
-        const videoUrl = vgVideos[i];
-        if (videoUrl) {
-          // show real video in phone
-          document.getElementById('vg-s-done').style.display = 'flex';
-          document.getElementById('vg-done-ttl').textContent = s.title;
-          document.getElementById('vg-done-sub').textContent = '10s · 9:16 · Kling 2.6';
-          // inject video element into phone
-          let phoneVid = document.getElementById('vg-phone-vid');
-          if (!phoneVid) {
-            phoneVid = document.createElement('video');
-            phoneVid.id = 'vg-phone-vid';
-            phoneVid.autoplay = true; phoneVid.loop = true; phoneVid.muted = true; phoneVid.playsInline = true;
-            phoneVid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;border-radius:20px;';
-            document.getElementById('vg-phone').appendChild(phoneVid);
-          }
-          phoneVid.src = videoUrl;
-          phoneVid.style.display = 'block';
-          // hide bars overlay when video plays
-          document.getElementById('vg-phone-bars').style.display = 'none';
-        } else {
-          document.getElementById('vg-s-done').style.display = 'flex';
-          document.getElementById('vg-done-ttl').textContent = s.title;
-          document.getElementById('vg-done-sub').textContent = '10s · 9:16 · Kling 2.6';
-        }
-        document.getElementById('vg-pb-dot').style.background = '#21d97a';
-        document.getElementById('vg-pb-fill').style.width = '100%';
-        document.getElementById('vg-pb-time').textContent = '0:10';
+  if(vgStates[i]==='pending'){
+    document.getElementById('vg-s-idle').style.display='flex';
+    document.getElementById('vg-idle-txt').textContent=`${s.title}`;
+    document.getElementById('vg-pb-dot').style.background='rgba(255,255,255,.25)';
+    document.getElementById('vg-pb-fill').style.width='0%';
+    document.getElementById('vg-pb-time').textContent='0:10';
+  } else if(vgStates[i]==='generating'){
+    document.getElementById('vg-s-gen').style.display='flex';
+  } else if(vgStates[i]==='done'){
+    const videoUrl = vgVideos[i];
+    if(videoUrl){
+      // show real video in phone
+      document.getElementById('vg-s-done').style.display='flex';
+      document.getElementById('vg-done-ttl').textContent=s.title;
+      document.getElementById('vg-done-sub').textContent='10s · 9:16 · Kling 2.6';
+      // inject video element into phone
+      let phoneVid = document.getElementById('vg-phone-vid');
+      if(!phoneVid){
+        phoneVid = document.createElement('video');
+        phoneVid.id='vg-phone-vid';
+        phoneVid.autoplay=true; phoneVid.loop=true; phoneVid.muted=true; phoneVid.playsInline=true;
+        phoneVid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;border-radius:20px;';
+        document.getElementById('vg-phone').appendChild(phoneVid);
       }
+      phoneVid.src=videoUrl;
+      phoneVid.style.display='block';
+      // hide bars overlay when video plays
+      document.getElementById('vg-phone-bars').style.display='none';
+    } else {
+      document.getElementById('vg-s-done').style.display='flex';
+      document.getElementById('vg-done-ttl').textContent=s.title;
+      document.getElementById('vg-done-sub').textContent='10s · 9:16 · Kling 2.6';
     }
+    document.getElementById('vg-pb-dot').style.background='#21d97a';
+    document.getElementById('vg-pb-fill').style.width='100%';
+    document.getElementById('vg-pb-time').textContent='0:10';
+  }
+}
 
-    function vgBuildSceneList() {
-      const col = document.getElementById('vg-scene-col');
-      const nav = document.getElementById('vg-nav-dots');
-      col.innerHTML = ''; nav.innerHTML = '';
+function vgBuildSceneList(){
+  const col=document.getElementById('vg-scene-col');
+  const nav=document.getElementById('vg-nav-dots');
+  col.innerHTML=''; nav.innerHTML='';
 
-      scenes.forEach((s, i) => {
-        const st = vgStates[i];
-        const badgeColor = st === 'done' ? 'rgba(33,217,122,.12)' : st === 'generating' ? 'rgba(255,176,32,.12)' : 'var(--bg4)';
-        const badgeTxt = st === 'done' ? '✓ Ready' : st === 'generating' ? '⏳ Generating' : '○ Pending';
-        const badgeC = st === 'done' ? '#21d97a' : st === 'generating' ? '#ffb020' : 'var(--t3)';
-        const progW = st === 'done' ? 100 : 0;
+  scenes.forEach((s,i)=>{
+    const st=vgStates[i];
+    const badgeColor=st==='done'?'rgba(33,217,122,.12)':st==='generating'?'rgba(255,176,32,.12)':'var(--bg4)';
+    const badgeTxt=st==='done'?'✓ Ready':st==='generating'?'⏳ Generating':'○ Pending';
+    const badgeC=st==='done'?'#21d97a':st==='generating'?'#ffb020':'var(--t3)';
+    const progW=st==='done'?100:0;
 
-        const row = document.createElement('div');
-        row.id = `vg-row${i}`;
-        row.style.cssText = `display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r);border:1px solid ${st === 'done' ? 'rgba(33,217,122,.2)' : st === 'generating' ? 'rgba(255,176,32,.2)' : 'var(--border)'};margin-bottom:6px;cursor:pointer;background:var(--bg2);transition:border-color .13s;`;
-        row.innerHTML = `
+    const row=document.createElement('div');
+    row.id=`vg-row${i}`;
+    row.style.cssText=`display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r);border:1px solid ${st==='done'?'rgba(33,217,122,.2)':st==='generating'?'rgba(255,176,32,.2)':'var(--border)'};margin-bottom:6px;cursor:pointer;background:var(--bg2);transition:border-color .13s;`;
+    row.innerHTML=`
       <div style="width:30px;height:54px;border-radius:5px;background:var(--bg3);flex-shrink:0;display:flex;align-items:flex-end;padding:3px;gap:1px;overflow:hidden;">
-        ${Array.from({ length: 5 }, vgBar).join('')}
+        ${Array.from({length:5},vgBar).join('')}
       </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:10px;color:var(--acc);font-weight:600;margin-bottom:2px;">SCENE ${String(s.scene_num).padStart(2, '0')}</div>
+        <div style="font-size:10px;color:var(--acc);font-weight:600;margin-bottom:2px;">SCENE ${String(s.scene_num).padStart(2,'0')}</div>
         <div style="font-size:12.5px;color:var(--txt);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${s.title}</div>
-        <div style="font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.video_prompt.slice(0, 60)}...</div>
+        <div style="font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.video_prompt.slice(0,60)}...</div>
         <div style="height:2px;background:var(--bg4);border-radius:1px;margin-top:5px;overflow:hidden;">
           <div id="vg-prog${i}" style="height:100%;background:#21d97a;border-radius:1px;width:${progW}%;transition:width .12s linear;"></div>
         </div>
       </div>
       <div style="flex-shrink:0;text-align:right;">
         <div id="vg-badge${i}" style="font-size:10px;padding:3px 8px;border-radius:20px;background:${badgeColor};color:${badgeC};font-weight:500;white-space:nowrap;">${badgeTxt}</div>
-        ${st === 'pending' ? `<button onclick="event.stopPropagation();vgGenOne(${i})" style="margin-top:5px;padding:3px 8px;font-size:10.5px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;">Generate</button>` : ''}
+        ${st==='pending'?`<button onclick="event.stopPropagation();vgGenOne(${i})" style="margin-top:5px;padding:3px 8px;font-size:10.5px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;">Generate</button>`:''}
       </div>`;
-        row.onclick = () => vgShowPhone(i);
-        col.appendChild(row);
+    row.onclick=()=>vgShowPhone(i);
+    col.appendChild(row);
 
-        const dot = document.createElement('div');
-        dot.className = 'vg-navdot';
-        dot.style.cssText = `width:6px;height:6px;border-radius:50%;background:var(--t3);cursor:pointer;transition:background .15s;`;
-        dot.onclick = (e) => { e.stopPropagation(); vgShowPhone(i); };
-        nav.appendChild(dot);
-      });
+    const dot=document.createElement('div');
+    dot.className='vg-navdot';
+    dot.style.cssText=`width:6px;height:6px;border-radius:50%;background:var(--t3);cursor:pointer;transition:background .15s;`;
+    dot.onclick=(e)=>{e.stopPropagation();vgShowPhone(i);};
+    nav.appendChild(dot);
+  });
+}
+
+function vgUpdateRow(i){
+  const st=vgStates[i];
+  const row=document.getElementById(`vg-row${i}`);
+  const badge=document.getElementById(`vg-badge${i}`);
+  if(!row||!badge) return;
+  row.style.borderColor=st==='done'?'rgba(33,217,122,.2)':st==='generating'?'rgba(255,176,32,.2)':'var(--border)';
+  badge.style.background=st==='done'?'rgba(33,217,122,.12)':st==='generating'?'rgba(255,176,32,.12)':'var(--bg4)';
+  badge.style.color=st==='done'?'#21d97a':st==='generating'?'#ffb020':'var(--t3)';
+  badge.textContent=st==='done'?'✓ Ready':st==='generating'?'⏳ Generating':'○ Pending';
+  if(st==='done'){
+    document.getElementById(`vg-prog${i}`).style.width='100%';
+    // add download btn if video url exists
+    const existDl=document.getElementById(`vg-dl${i}`);
+    if(!existDl && vgVideos[i]){
+      const dlBtn=document.createElement('a');
+      dlBtn.id=`vg-dl${i}`;
+      dlBtn.href=vgVideos[i]; dlBtn.target='_blank'; dlBtn.download=`scene_${i+1}.mp4`;
+      dlBtn.style.cssText='display:block;margin-top:4px;padding:3px 8px;font-size:10px;border:1px solid rgba(33,217,122,.3);border-radius:6px;color:#21d97a;text-decoration:none;text-align:center;';
+      dlBtn.textContent='⬇ Download';
+      row.querySelector('[id^=vg-badge]').parentElement.appendChild(dlBtn);
     }
+  }
+}
 
-    function vgUpdateRow(i) {
-      const st = vgStates[i];
-      const row = document.getElementById(`vg-row${i}`);
-      const badge = document.getElementById(`vg-badge${i}`);
-      if (!row || !badge) return;
-      row.style.borderColor = st === 'done' ? 'rgba(33,217,122,.2)' : st === 'generating' ? 'rgba(255,176,32,.2)' : 'var(--border)';
-      badge.style.background = st === 'done' ? 'rgba(33,217,122,.12)' : st === 'generating' ? 'rgba(255,176,32,.12)' : 'var(--bg4)';
-      badge.style.color = st === 'done' ? '#21d97a' : st === 'generating' ? '#ffb020' : 'var(--t3)';
-      badge.textContent = st === 'done' ? '✓ Ready' : st === 'generating' ? '⏳ Generating' : '○ Pending';
-      if (st === 'done') {
-        document.getElementById(`vg-prog${i}`).style.width = '100%';
-        // add download btn if video url exists
-        const existDl = document.getElementById(`vg-dl${i}`);
-        if (!existDl && vgVideos[i]) {
-          const dlBtn = document.createElement('a');
-          dlBtn.id = `vg-dl${i}`;
-          dlBtn.href = vgVideos[i]; dlBtn.target = '_blank'; dlBtn.download = `scene_${i + 1}.mp4`;
-          dlBtn.style.cssText = 'display:block;margin-top:4px;padding:3px 8px;font-size:10px;border:1px solid rgba(33,217,122,.3);border-radius:6px;color:#21d97a;text-decoration:none;text-align:center;';
-          dlBtn.textContent = '⬇ Download';
-          row.querySelector('[id^=vg-badge]').parentElement.appendChild(dlBtn);
-        }
-      }
+// ─── KLING API CONFIG ──────────────────────────────────────────
+let klingApiKey = '';
+
+function getKlingKey(){
+  return document.getElementById('kling-key-inp')?.value?.trim() || klingApiKey;
+}
+
+function checkKlingKey(){
+  const k=document.getElementById('kling-key-inp').value.trim();
+  const dot=document.getElementById('kling-dot');
+  const status=document.getElementById('kling-key-status');
+  const ok=k.length>10;
+  if(dot) dot.style.background=ok?'#21d97a':'var(--t3)';
+  if(status) status.style.display=ok?'block':'none';
+}
+
+function toggleKlingVis(){
+  const inp=document.getElementById('kling-key-inp');
+  const btn=document.getElementById('kling-vis-btn');
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'show':'hide';
+}
+
+// ─── KIE.AI Kling 2.6 API (ผ่าน Cloudflare Worker) ───────────
+async function klingSubmit(prompt, refImgUrl){
+  const workerUrl = getWorkerUrl();
+  if(!workerUrl) throw new Error('ยังไม่ได้ใส่ Worker URL — ใส่ในช่อง Worker URL แล้วลองใหม่');
+
+  const body = {
+    prompt,
+    aspect_ratio: '9:16',
+    duration: '5',
+    sound: false,
+    model: refImgUrl ? 'kling-2.6/image-to-video' : 'kling-2.6/text-to-video',
+    ...(refImgUrl ? { image: refImgUrl } : {})
+  };
+
+  let res, data;
+  try{
+    res = await fetch(`${workerUrl}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    data = await res.json();
+  }catch(err){
+    throw new Error(`Worker ไม่ตอบสนอง (${workerUrl}/submit) — ตรวจสอบว่า Worker deploy แล้ว: ${err.message}`);
+  }
+
+  if(!res.ok){
+    throw new Error(`Worker error ${res.status}: ${data?.error || data?.message || JSON.stringify(data).slice(0,100)}`);
+  }
+
+  const taskId = data?.data?.task_id || data?.task_id || data?.id;
+  if(!taskId){
+    throw new Error(`ไม่ได้รับ task_id — kie.ai ตอบ: ${JSON.stringify(data).slice(0,150)}`);
+  }
+  return taskId;
+}
+
+async function klingPoll(taskId, onProgress){
+  const workerUrl = getWorkerUrl();
+  const MAX = 120;
+  for(let attempt=0; attempt<MAX; attempt++){
+    await new Promise(r=>setTimeout(r,5000));
+    const res = await fetch(`${workerUrl}/status/${taskId}`);
+    if(!res.ok) continue;
+    const data = await res.json();
+    const task = data?.data || data;
+    const status = task?.task_status || task?.status || '';
+    const pct = Math.min(95, Math.round(((attempt+1)/MAX)*100));
+    onProgress(pct, status);
+    if(status === 'succeed' || status === 'completed'){
+      const videos = task?.task_result?.videos || task?.videos || [];
+      const url = videos[0]?.url || videos[0]?.video_url || '';
+      if(url) return url;
+      throw new Error('Task สำเร็จแต่ไม่มี video URL');
     }
-
-    // ─── KLING API CONFIG ──────────────────────────────────────────
-    let klingApiKey = '';
-
-    function getKlingKey() {
-      return document.getElementById('kling-key-inp')?.value?.trim() || klingApiKey;
+    if(status === 'failed' || status === 'error'){
+      throw new Error(`Task failed: ${task?.task_status_msg || 'unknown'}`);
     }
+  }
+  throw new Error('Timeout — เกิน 10 นาที ลอง generate ใหม่');
+}
 
-    function checkKlingKey() {
-      const k = document.getElementById('kling-key-inp').value.trim();
-      const dot = document.getElementById('kling-dot');
-      const status = document.getElementById('kling-key-status');
-      const ok = k.length > 10;
-      if (dot) dot.style.background = ok ? '#21d97a' : 'var(--t3)';
-      if (status) status.style.display = ok ? 'block' : 'none';
+// video URLs เก็บไว้แสดงใน phone
+const vgVideos = {};
+
+async function vgGenOne(i){
+  if(vgStates[i]==='generating') return;
+  if(vgStates[i]==='done' && vgVideos[i]){ vgShowPhone(i); return; }
+
+  vgStates[i]='generating';
+  vgUpdateRow(i);
+  if(vgDisplay===i||vgDisplay===-1) vgShowPhone(i);
+  vgUpdateStats();
+
+  const s = scenes[i];
+  vgAddLog(`Scene ${s.scene_num}: "${s.title}" — ส่ง task ไป Kling 2.6`);
+
+  const updateRing=(p,msg)=>{
+    const prog=document.getElementById(`vg-prog${i}`);
+    if(prog) prog.style.width=p+'%';
+    if(vgDisplay===i){
+      const ring=document.getElementById('vg-ring');
+      if(ring) ring.style.strokeDashoffset=138-(138*(p/100));
+      const rp=document.getElementById('vg-ring-pct');
+      if(rp) rp.textContent=p+'%';
+      const pb=document.getElementById('vg-pb-fill');
+      if(pb) pb.style.width=p+'%';
+      const step=document.getElementById('vg-gen-step');
+      if(step) step.textContent=msg||'กำลังสร้าง...';
     }
+  };
 
-    function toggleKlingVis() {
-      const inp = document.getElementById('kling-key-inp');
-      const btn = document.getElementById('kling-vis-btn');
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-      btn.textContent = inp.type === 'password' ? 'show' : 'hide';
+  try{
+    updateRing(5,'ส่ง prompt ไป Kling...');
+    const refUrl = refImgB64 ? `data:image/jpeg;base64,${refImgB64}` : null;
+    const taskId = await klingSubmit(s.video_prompt, refUrl);
+    vgAddLog(`Scene ${s.scene_num}: task_id=${taskId} — กำลัง poll...`);
+    updateRing(10,'Kling รับ task แล้ว รอ queue...');
+
+    const videoUrl = await klingPoll(taskId,(pct,status)=>{
+      const msgs={'processing':'Rendering frames...','running':'กำลัง encode...','pending':'รอ queue...'};
+      updateRing(10+Math.round(pct*0.85), msgs[status]||`${status}...`);
+      vgAddLog(`Scene ${s.scene_num}: ${status} ${pct}%`);
+    });
+
+    vgVideos[i] = videoUrl;
+    updateRing(100,'เสร็จแล้ว!');
+    vgStates[i]='done';
+    vgUpdateRow(i);
+    if(vgDisplay===i) vgShowPhone(i);
+    vgUpdateStats();
+    vgAddLog(`Scene ${s.scene_num}: ✓ Done — ${videoUrl.slice(0,50)}...`, true);
+
+  }catch(err){
+    vgStates[i]='pending';
+    vgUpdateRow(i);
+    vgUpdateStats();
+    vgAddLog(`Scene ${s.scene_num}: ❌ ${err.message}`);
+    if(vgDisplay===i) vgShowPhone(i);
+    // show error in badge
+    const badge=document.getElementById(`vg-badge${i}`);
+    if(badge){badge.textContent='❌ Error — ลองใหม่';badge.style.color='#ff4f4f';badge.style.background='rgba(255,79,79,.1)';}
+  }
+}
+
+async function vgGenerateAll(){
+  document.getElementById('vg-gen-all-btn').disabled=true;
+  for(let i=0;i<scenes.length;i++){
+    if(vgStates[i]==='pending'){
+      vgShowPhone(i);
+      await vgGenOne(i);
+      await new Promise(r=>setTimeout(r,200));
     }
+  }
+  document.getElementById('vg-gen-all-btn').disabled=false;
+  vgAddLog('═══ ทุก scene พร้อมแล้ว — copy prompts แล้วนำไป render ใน Kling/Veo ════',true);
+}
 
-    // ─── KIE.AI Kling 2.6 API (ผ่าน Cloudflare Worker) ───────────
-    async function klingSubmit(prompt, refImgUrl) {
-      const workerUrl = getWorkerUrl();
-      if (!workerUrl) throw new Error('ยังไม่ได้ใส่ Worker URL — ใส่ในช่อง Worker URL แล้วลองใหม่');
+function vgReset(){
+  vgTimers.forEach(clearInterval); vgTimers=[];
+  vgStates=scenes.map(()=>'pending');
+  vgSelected=-1; vgDisplay=-1; vgLogLines=[];
+  document.getElementById('vg-log').style.display='none';
+  document.getElementById('vg-gen-all-btn').disabled=false;
+  vgBuildSceneList();
+  ['vg-s-idle','vg-s-gen','vg-s-done'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('vg-s-idle').style.display='flex';
+  document.getElementById('vg-idle-txt').textContent='เลือก scene\nเพื่อ preview';
+  document.getElementById('vg-pb-fill').style.width='0%';
+  document.getElementById('vg-pb-dot').style.background='rgba(255,255,255,.25)';
+  document.getElementById('vg-scene-lbl').textContent='—';
+  vgUpdateStats();
+}
 
-      const body = {
-        prompt,
-        aspect_ratio: '9:16',
-        duration: '5',
-        sound: false,
-        model: refImgUrl ? 'kling-2.6/image-to-video' : 'kling-2.6/text-to-video',
-        ...(refImgUrl ? { image: refImgUrl } : {})
-      };
+function vgCycleScene(){
+  const next=(vgDisplay+1)%scenes.length;
+  vgShowPhone(next);
+}
 
-      let res, data;
-      try {
-        res = await fetch(`${workerUrl}/submit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        data = await res.json();
-      } catch (err) {
-        throw new Error(`Worker ไม่ตอบสนอง (${workerUrl}/submit) — ตรวจสอบว่า Worker deploy แล้ว: ${err.message}`);
-      }
+// ─── VIDEO GEN PAGE ────────────────────────────────────────────
+function renderVGPage(){
+  const has=scenes.length>0;
+  document.getElementById('vg-empty').style.display=has?'none':'block';
+  document.getElementById('vg-content').style.display=has?'block':'none';
+  if(!has) return;
+  vgStates=vgStates.length===scenes.length?vgStates:scenes.map(()=>'pending');
+  vgInitPhoneBars();
+  vgBuildSceneList();
+  vgUpdateStats();
+}
+function genFromVG(i,btn){btn.disabled=true;vgGenOne(i).then(()=>vgBuildSceneList());}
+function genAllFromVG(){vgGenerateAll();}
+function copyVGPrompt(i){navigator.clipboard.writeText(scenes[i]?.video_prompt||'');}
 
-      if (!res.ok) {
-        throw new Error(`Worker error ${res.status}: ${data?.error || data?.message || JSON.stringify(data).slice(0, 100)}`);
-      }
-
-      const taskId = data?.data?.task_id || data?.task_id || data?.id;
-      if (!taskId) {
-        throw new Error(`ไม่ได้รับ task_id — kie.ai ตอบ: ${JSON.stringify(data).slice(0, 150)}`);
-      }
-      return taskId;
-    }
-
-    async function klingPoll(taskId, onProgress) {
-      const workerUrl = getWorkerUrl();
-      const MAX = 120;
-      for (let attempt = 0; attempt < MAX; attempt++) {
-        await new Promise(r => setTimeout(r, 5000));
-        const res = await fetch(`${workerUrl}/status/${taskId}`);
-        if (!res.ok) continue;
-        const data = await res.json();
-        const task = data?.data || data;
-        const status = task?.task_status || task?.status || '';
-        const pct = Math.min(95, Math.round(((attempt + 1) / MAX) * 100));
-        onProgress(pct, status);
-        if (status === 'succeed' || status === 'completed') {
-          const videos = task?.task_result?.videos || task?.videos || [];
-          const url = videos[0]?.url || videos[0]?.video_url || '';
-          if (url) return url;
-          throw new Error('Task สำเร็จแต่ไม่มี video URL');
-        }
-        if (status === 'failed' || status === 'error') {
-          throw new Error(`Task failed: ${task?.task_status_msg || 'unknown'}`);
-        }
-      }
-      throw new Error('Timeout — เกิน 10 นาที ลอง generate ใหม่');
-    }
-
-    // video URLs เก็บไว้แสดงใน phone
-    const vgVideos = {};
-
-    async function vgGenOne(i) {
-      if (vgStates[i] === 'generating') return;
-      if (vgStates[i] === 'done' && vgVideos[i]) { vgShowPhone(i); return; }
-
-      vgStates[i] = 'generating';
-      vgUpdateRow(i);
-      if (vgDisplay === i || vgDisplay === -1) vgShowPhone(i);
-      vgUpdateStats();
-
-      const s = scenes[i];
-      vgAddLog(`Scene ${s.scene_num}: "${s.title}" — ส่ง task ไป Kling 2.6`);
-
-      const updateRing = (p, msg) => {
-        const prog = document.getElementById(`vg-prog${i}`);
-        if (prog) prog.style.width = p + '%';
-        if (vgDisplay === i) {
-          const ring = document.getElementById('vg-ring');
-          if (ring) ring.style.strokeDashoffset = 138 - (138 * (p / 100));
-          const rp = document.getElementById('vg-ring-pct');
-          if (rp) rp.textContent = p + '%';
-          const pb = document.getElementById('vg-pb-fill');
-          if (pb) pb.style.width = p + '%';
-          const step = document.getElementById('vg-gen-step');
-          if (step) step.textContent = msg || 'กำลังสร้าง...';
-        }
-      };
-
-      try {
-        updateRing(5, 'ส่ง prompt ไป Kling...');
-        const refUrl = refImgB64 ? `data:image/jpeg;base64,${refImgB64}` : null;
-        const taskId = await klingSubmit(s.video_prompt, refUrl);
-        vgAddLog(`Scene ${s.scene_num}: task_id=${taskId} — กำลัง poll...`);
-        updateRing(10, 'Kling รับ task แล้ว รอ queue...');
-
-        const videoUrl = await klingPoll(taskId, (pct, status) => {
-          const msgs = { 'processing': 'Rendering frames...', 'running': 'กำลัง encode...', 'pending': 'รอ queue...' };
-          updateRing(10 + Math.round(pct * 0.85), msgs[status] || `${status}...`);
-          vgAddLog(`Scene ${s.scene_num}: ${status} ${pct}%`);
-        });
-
-        vgVideos[i] = videoUrl;
-        updateRing(100, 'เสร็จแล้ว!');
-        vgStates[i] = 'done';
-        vgUpdateRow(i);
-        if (vgDisplay === i) vgShowPhone(i);
-        vgUpdateStats();
-        vgAddLog(`Scene ${s.scene_num}: ✓ Done — ${videoUrl.slice(0, 50)}...`, true);
-
-      } catch (err) {
-        vgStates[i] = 'pending';
-        vgUpdateRow(i);
-        vgUpdateStats();
-        vgAddLog(`Scene ${s.scene_num}: ❌ ${err.message}`);
-        if (vgDisplay === i) vgShowPhone(i);
-        // show error in badge
-        const badge = document.getElementById(`vg-badge${i}`);
-        if (badge) { badge.textContent = '❌ Error — ลองใหม่'; badge.style.color = '#ff4f4f'; badge.style.background = 'rgba(255,79,79,.1)'; }
-      }
-    }
-
-    async function vgGenerateAll() {
-      document.getElementById('vg-gen-all-btn').disabled = true;
-      for (let i = 0; i < scenes.length; i++) {
-        if (vgStates[i] === 'pending') {
-          vgShowPhone(i);
-          await vgGenOne(i);
-          await new Promise(r => setTimeout(r, 200));
-        }
-      }
-      document.getElementById('vg-gen-all-btn').disabled = false;
-      vgAddLog('═══ ทุก scene พร้อมแล้ว — copy prompts แล้วนำไป render ใน Kling/Veo ════', true);
-    }
-
-    function vgReset() {
-      vgTimers.forEach(clearInterval); vgTimers = [];
-      vgStates = scenes.map(() => 'pending');
-      vgSelected = -1; vgDisplay = -1; vgLogLines = [];
-      document.getElementById('vg-log').style.display = 'none';
-      document.getElementById('vg-gen-all-btn').disabled = false;
-      vgBuildSceneList();
-      ['vg-s-idle', 'vg-s-gen', 'vg-s-done'].forEach(id => document.getElementById(id).style.display = 'none');
-      document.getElementById('vg-s-idle').style.display = 'flex';
-      document.getElementById('vg-idle-txt').textContent = 'เลือก scene\nเพื่อ preview';
-      document.getElementById('vg-pb-fill').style.width = '0%';
-      document.getElementById('vg-pb-dot').style.background = 'rgba(255,255,255,.25)';
-      document.getElementById('vg-scene-lbl').textContent = '—';
-      vgUpdateStats();
-    }
-
-    function vgCycleScene() {
-      const next = (vgDisplay + 1) % scenes.length;
-      vgShowPhone(next);
-    }
-
-    // ─── VIDEO GEN PAGE ────────────────────────────────────────────
-    function renderVGPage() {
-      const has = scenes.length > 0;
-      document.getElementById('vg-empty').style.display = has ? 'none' : 'block';
-      document.getElementById('vg-content').style.display = has ? 'block' : 'none';
-      if (!has) return;
-      vgStates = vgStates.length === scenes.length ? vgStates : scenes.map(() => 'pending');
-      vgInitPhoneBars();
-      vgBuildSceneList();
-      vgUpdateStats();
-    }
-    function genFromVG(i, btn) { btn.disabled = true; vgGenOne(i).then(() => vgBuildSceneList()); }
-    function genAllFromVG() { vgGenerateAll(); }
-    function copyVGPrompt(i) { navigator.clipboard.writeText(scenes[i]?.video_prompt || ''); }
-
-    // ─── DOWNLOAD ──────────────────────────────────────────────────
-    function dlAll(type) {
-      if (!scenes.length) return;
-      const txt = scenes.map(s => `=== SCENE ${s.scene_num}: ${s.title} ===\n${type === 'img' ? s.img_prompt : s.video_prompt}\n`).join('\n');
-      Object.assign(document.createElement('a'), {
-        href: URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' })),
-        download: type === 'img' ? 'img_prompts.txt' : 'video_prompts.txt'
-      }).click();
-    }
+// ─── DOWNLOAD ──────────────────────────────────────────────────
+function dlAll(type){
+  if(!scenes.length) return;
+  const txt=scenes.map(s=>`=== SCENE ${s.scene_num}: ${s.title} ===\n${type==='img'?s.img_prompt:s.video_prompt}\n`).join('\n');
+  Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'})),
+    download:type==='img'?'img_prompts.txt':'video_prompts.txt'
+  }).click();
+}
 
 
-  </script>
+</script>
 </body>
-
 </html>
