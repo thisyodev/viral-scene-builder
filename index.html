@@ -323,12 +323,13 @@ textarea.inp{min-height:130px;resize:vertical;line-height:1.75;}
                 style="padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">show</button>
             </div>
             <select id="or-model-sel" style="width:100%;margin-top:5px;padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;appearance:none;">
-              <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (ฟรี · ดีที่สุด)</option>
-              <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (ฟรี · เร็ว)</option>
-              <option value="google/gemma-3-27b-it:free">Gemma 3 27B (ฟรี · Google)</option>
-              <option value="deepseek/deepseek-r1:free">DeepSeek R1 (ฟรี · คิดลึก)</option>
+              <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (แนะนำ · ฟรี)</option>
+              <option value="google/gemma-3-27b-it:free">Gemma 3 27B (Google · ฟรี)</option>
+              <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (เร็ว · ฟรี)</option>
+              <option value="microsoft/phi-3-mini-128k-instruct:free">Phi-3 Mini (Microsoft · ฟรี)</option>
+              <option value="deepseek/deepseek-r1:free">DeepSeek R1 (คิดลึก · ฟรี)</option>
             </select>
-            <div style="font-size:10px;color:var(--t3);margin-top:4px;">openrouter.ai/keys — ฟรี ไม่ต้อง billing · สมัคร 1 นาที</div>
+            <div style="font-size:10px;color:var(--acc);margin-top:4px;">✓ Auto-retry ถ้า model ไม่ตอบ — ลอง fallback อัตโนมัติ</div>
           </div>
             <div style="display:flex;align-items:center;gap:6px;">
               <div id="ai-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
@@ -860,10 +861,14 @@ async function callGemini(systemPrompt, userMsg){
 }
 
 // ─── OPENROUTER API CALL ───────────────────────────────────────
-async function callOpenRouter(systemPrompt, userMsg){
-  const key = document.getElementById('or-key-inp')?.value?.trim();
-  if(!key) throw new Error('กรุณาใส่ OpenRouter API Key — รับฟรีที่ openrouter.ai/keys');
-  const model = document.getElementById('or-model-sel')?.value || 'meta-llama/llama-3.3-70b-instruct:free';
+const OR_FALLBACKS = [
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'google/gemma-3-27b-it:free',
+  'mistralai/mistral-7b-instruct:free',
+  'microsoft/phi-3-mini-128k-instruct:free',
+];
+
+async function callOpenRouterModel(key, model, systemPrompt, userMsg){
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions',{
     method:'POST',
     headers:{
@@ -882,12 +887,33 @@ async function callOpenRouter(systemPrompt, userMsg){
       temperature:0.7
     })
   });
-  if(!res.ok){
-    const e=await res.json().catch(()=>({}));
-    throw new Error(e.error?.message||`OpenRouter HTTP ${res.status}`);
+  const data = await res.json();
+  if(!res.ok || data.error) throw new Error(data.error?.message||`HTTP ${res.status}`);
+  const text = data.choices?.[0]?.message?.content||'';
+  if(!text) throw new Error('empty response');
+  return text;
+}
+
+async function callOpenRouter(systemPrompt, userMsg){
+  const key = document.getElementById('or-key-inp')?.value?.trim();
+  if(!key) throw new Error('กรุณาใส่ OpenRouter API Key — รับฟรีที่ openrouter.ai/keys');
+
+  const selected = document.getElementById('or-model-sel')?.value || OR_FALLBACKS[0];
+  const tryModels = [selected, ...OR_FALLBACKS.filter(m=>m!==selected)];
+
+  let lastErr = '';
+  for(const model of tryModels){
+    try{
+      vgAddLog && vgAddLog(`OpenRouter: กำลังลอง ${model.split('/').pop()}...`);
+      const mel = document.getElementById('load-msg');
+      if(mel) mel.textContent = `ลอง ${model.split('/').pop()}...`;
+      return await callOpenRouterModel(key, model, systemPrompt, userMsg);
+    }catch(e){
+      lastErr = e.message;
+      console.warn(`OpenRouter ${model} failed:`, e.message);
+    }
   }
-  const data=await res.json();
-  return data.choices?.[0]?.message?.content||'';
+  throw new Error(`OpenRouter ทุก model ไม่ตอบ — ${lastErr}`);
 }
 
 // ─── ANALYZE ───────────────────────────────────────────────────
