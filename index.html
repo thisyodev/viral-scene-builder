@@ -297,17 +297,39 @@ textarea.inp{min-height:130px;resize:vertical;line-height:1.75;}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div>
           <div style="font-size:10px;color:var(--t2);margin-bottom:6px;">AI Model (Scene Builder)</div>
-          <div style="display:flex;gap:5px;margin-bottom:7px;">
+          <div style="display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap;">
             <button id="ai-btn-gemini" onclick="setAIModel('gemini')"
-              style="flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(75,158,255,.4);background:rgba(75,158,255,.12);color:var(--blue);cursor:pointer;font-family:'DM Sans',sans-serif;">
-              Gemini Flash<br><span style="font-size:9px;font-weight:400;opacity:.8;">ฟรี 100%</span>
+              style="flex:1;min-width:80px;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;">
+              Gemini<br><span style="font-size:9px;font-weight:400;">aistudio key</span>
+            </button>
+            <button id="ai-btn-openrouter" onclick="setAIModel('openrouter')"
+              style="flex:1;min-width:80px;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(167,139,250,.4);background:rgba(167,139,250,.12);color:var(--purple);cursor:pointer;font-family:'DM Sans',sans-serif;">
+              OpenRouter<br><span style="font-size:9px;font-weight:400;opacity:.8;">ฟรี ✓</span>
             </button>
             <button id="ai-btn-claude" onclick="setAIModel('claude')"
-              style="flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;">
-              Claude Sonnet<br><span style="font-size:9px;font-weight:400;opacity:.8;">~$0.01/run</span>
+              style="flex:1;min-width:80px;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;">
+              Claude<br><span style="font-size:9px;font-weight:400;">~$0.01/run</span>
             </button>
           </div>
-          <div id="gemini-key-wrap">
+          <div id="openrouter-key-wrap" style="display:none;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div id="or-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;"></div>
+              <input id="or-key-inp" type="password" placeholder="sk-or-v1-... (OpenRouter API Key)"
+                style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
+                oninput="checkAIKey()"
+                onfocus="this.style.borderColor='var(--purple)'"
+                onblur="this.style.borderColor='var(--border2)'">
+              <button onclick="toggleORVis()" id="or-vis-btn"
+                style="padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">show</button>
+            </div>
+            <select id="or-model-sel" style="width:100%;margin-top:5px;padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;appearance:none;">
+              <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (ฟรี · ดีที่สุด)</option>
+              <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (ฟรี · เร็ว)</option>
+              <option value="google/gemma-3-27b-it:free">Gemma 3 27B (ฟรี · Google)</option>
+              <option value="deepseek/deepseek-r1:free">DeepSeek R1 (ฟรี · คิดลึก)</option>
+            </select>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px;">openrouter.ai/keys — ฟรี ไม่ต้อง billing · สมัคร 1 นาที</div>
+          </div>
             <div style="display:flex;align-items:center;gap:6px;">
               <div id="ai-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
               <input id="gemini-key-inp" type="password" placeholder="Gemini API Key — aistudio.google.com/apikey"
@@ -600,6 +622,8 @@ const TAG_CLASS={f:'tg-f',d:'tg-d',m:'tg-m',l:'tg-l',p:'tg-p',s:'tg-s'};
     b.onclick=()=>{setMode('story');document.getElementById('story-txt').value=ex.story;document.getElementById('story-txt').scrollIntoView({behavior:'smooth',block:'nearest'});};
     (ex.tag==='s'?gShop:gViral).appendChild(b);
   });
+  // default to OpenRouter (free, no quota issues)
+  setTimeout(()=>setAIModel('openrouter'), 0);
 })();
 
 // ─── STATE ─────────────────────────────────────────────────────
@@ -693,45 +717,62 @@ function clearRefImg(){
 }
 
 // ─── AI MODEL STATE ────────────────────────────────────────────
-let _aiModel = 'gemini'; // 'gemini' | 'claude'
+let _aiModel = 'openrouter';
 
 function setAIModel(model){
   _aiModel = model;
-  const gb = document.getElementById('ai-btn-gemini');
-  const cb = document.getElementById('ai-btn-claude');
-  const gw = document.getElementById('gemini-key-wrap');
-  const cw = document.getElementById('claude-key-wrap');
-  if(model === 'gemini'){
-    gb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(75,158,255,.5);background:rgba(75,158,255,.15);color:var(--blue);cursor:pointer;font-family:"DM Sans",sans-serif;';
-    cb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:"DM Sans",sans-serif;';
-    if(gw) gw.style.display='block';
-    if(cw) cw.style.display='none';
-  } else {
-    cb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(33,217,122,.4);background:rgba(33,217,122,.1);color:var(--acc);cursor:pointer;font-family:"DM Sans",sans-serif;';
-    gb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:"DM Sans",sans-serif;';
-    if(cw) cw.style.display='block';
-    if(gw) gw.style.display='none';
-  }
+  const btns = {
+    gemini: document.getElementById('ai-btn-gemini'),
+    openrouter: document.getElementById('ai-btn-openrouter'),
+    claude: document.getElementById('ai-btn-claude')
+  };
+  const wraps = {
+    gemini: document.getElementById('gemini-key-wrap'),
+    openrouter: document.getElementById('openrouter-key-wrap'),
+    claude: document.getElementById('claude-key-wrap')
+  };
+  const activeColors = {
+    gemini: 'border:1.5px solid rgba(75,158,255,.5);background:rgba(75,158,255,.15);color:var(--blue);',
+    openrouter: 'border:1.5px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:var(--purple);',
+    claude: 'border:1.5px solid rgba(33,217,122,.4);background:rgba(33,217,122,.1);color:var(--acc);'
+  };
+  const base = 'flex:1;min-width:80px;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);cursor:pointer;font-family:"DM Sans",sans-serif;';
+  Object.keys(btns).forEach(k=>{
+    if(!btns[k]) return;
+    btns[k].style.cssText = base + (k===model ? activeColors[k] : 'border:1px solid var(--border2);background:transparent;color:var(--t2);');
+    if(wraps[k]) wraps[k].style.display = k===model ? 'block' : 'none';
+  });
   checkAIKey();
 }
 
 function getAIKey(){
-  if(_aiModel === 'gemini') return document.getElementById('gemini-key-inp')?.value?.trim() || _claudeKey;
-  return document.getElementById('claude-key-inp')?.value?.trim() || _claudeKey;
+  if(_aiModel==='gemini') return document.getElementById('gemini-key-inp')?.value?.trim()||'';
+  if(_aiModel==='openrouter') return document.getElementById('or-key-inp')?.value?.trim()||'';
+  return document.getElementById('claude-key-inp')?.value?.trim()||_claudeKey||'';
 }
 
 function checkAIKey(){
   const k = getAIKey();
   const ok = k.length > 10;
-  const dot = document.getElementById('ai-dot') || document.getElementById('claude-dot');
+  const dotId = _aiModel==='gemini'?'ai-dot':_aiModel==='openrouter'?'or-dot':'claude-dot';
+  const dot = document.getElementById(dotId);
   if(dot) dot.style.background = ok ? '#21d97a' : 'var(--t3)';
   const status = document.getElementById('keys-status');
+  const names = {gemini:'Gemini Flash', openrouter:'OpenRouter', claude:'Claude Sonnet'};
   if(status){
     status.textContent = ok
-      ? `✓ ${_aiModel==='gemini'?'Gemini Flash':'Claude Sonnet'} พร้อม — เลือก template แล้วกด วิเคราะห์ได้เลย`
-      : `ใส่ ${_aiModel==='gemini'?'Gemini':'Claude'} API Key เพื่อเริ่มสร้าง scenes`;
+      ? `✓ ${names[_aiModel]} พร้อม — เลือก template แล้วกด วิเคราะห์ได้เลย`
+      : `ใส่ ${names[_aiModel]} API Key เพื่อเริ่มสร้าง scenes`;
     status.style.color = ok ? 'var(--acc)' : 'var(--t3)';
   }
+}
+
+function toggleORVis(){
+  const inp=document.getElementById('or-key-inp');
+  const btn=document.getElementById('or-vis-btn');
+  if(!inp) return;
+  inp.type=inp.type==='password'?'text':'password';
+  if(btn) btn.textContent=inp.type==='password'?'show':'hide';
 }
 
 function toggleGeminiVis(){
@@ -818,6 +859,37 @@ async function callGemini(systemPrompt, userMsg){
   return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
 }
 
+// ─── OPENROUTER API CALL ───────────────────────────────────────
+async function callOpenRouter(systemPrompt, userMsg){
+  const key = document.getElementById('or-key-inp')?.value?.trim();
+  if(!key) throw new Error('กรุณาใส่ OpenRouter API Key — รับฟรีที่ openrouter.ai/keys');
+  const model = document.getElementById('or-model-sel')?.value || 'meta-llama/llama-3.3-70b-instruct:free';
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`Bearer ${key}`,
+      'HTTP-Referer':'https://thisyodev.github.io/viral-scene-builder/',
+      'X-Title':'Viral Scene Builder'
+    },
+    body:JSON.stringify({
+      model,
+      messages:[
+        {role:'system', content:systemPrompt},
+        {role:'user', content:userMsg}
+      ],
+      max_tokens:4000,
+      temperature:0.7
+    })
+  });
+  if(!res.ok){
+    const e=await res.json().catch(()=>({}));
+    throw new Error(e.error?.message||`OpenRouter HTTP ${res.status}`);
+  }
+  const data=await res.json();
+  return data.choices?.[0]?.message?.content||'';
+}
+
 // ─── ANALYZE ───────────────────────────────────────────────────
 async function analyze(){
   hideErr();
@@ -883,13 +955,14 @@ Additional rules:
 
   try{
     let rawText = '';
+    const userMsgPlain = inputMode==='youtube'
+      ? `Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
+      : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
 
     if(_aiModel === 'gemini'){
-      // ── Gemini Flash (ฟรี) ──
-      const userMsg = inputMode==='youtube'
-        ? `Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
-        : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
-      rawText = await callGemini(sys, userMsg);
+      rawText = await callGemini(sys, userMsgPlain);
+    } else if(_aiModel === 'openrouter'){
+      rawText = await callOpenRouter(sys, userMsgPlain);
     } else {
       // ── Claude Sonnet ──
       const claudeKey = document.getElementById('claude-key-inp')?.value?.trim() || _claudeKey;
