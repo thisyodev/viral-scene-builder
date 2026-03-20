@@ -295,13 +295,37 @@ textarea.inp{min-height:130px;resize:vertical;line-height:1.75;}
       <div style="background:var(--bg2);border:1.5px solid rgba(33,217,122,.2);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px;">
         <div style="font-size:11px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">🔑 API Keys — ใส่ครั้งเดียวใช้ได้ทั้ง app</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div>
-            <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Claude API Key (Scene Builder)</div>
+        <div>
+          <div style="font-size:10px;color:var(--t2);margin-bottom:6px;">AI Model (Scene Builder)</div>
+          <div style="display:flex;gap:5px;margin-bottom:7px;">
+            <button id="ai-btn-gemini" onclick="setAIModel('gemini')"
+              style="flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(75,158,255,.4);background:rgba(75,158,255,.12);color:var(--blue);cursor:pointer;font-family:'DM Sans',sans-serif;">
+              Gemini Flash<br><span style="font-size:9px;font-weight:400;opacity:.8;">ฟรี 100%</span>
+            </button>
+            <button id="ai-btn-claude" onclick="setAIModel('claude')"
+              style="flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;">
+              Claude Sonnet<br><span style="font-size:9px;font-weight:400;opacity:.8;">~$0.01/run</span>
+            </button>
+          </div>
+          <div id="gemini-key-wrap">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div id="ai-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
+              <input id="gemini-key-inp" type="password" placeholder="Gemini API Key — aistudio.google.com/apikey"
+                style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
+                oninput="checkAIKey()"
+                onfocus="this.style.borderColor='var(--blue)'"
+                onblur="this.style.borderColor='var(--border2)'">
+              <button onclick="toggleGeminiVis()" id="gemini-vis-btn"
+                style="padding:6px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--t2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0;">show</button>
+            </div>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px;">aistudio.google.com/apikey — ฟรี 15 req/นาที · 1M req/วัน</div>
+          </div>
+          <div id="claude-key-wrap" style="display:none;">
             <div style="display:flex;align-items:center;gap:6px;">
               <div id="claude-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s;"></div>
               <input id="claude-key-inp" type="password" placeholder="sk-ant-api03-..."
                 style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--txt);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;min-width:0;"
-                oninput="checkClaudeKey()"
+                oninput="checkAIKey()"
                 onfocus="this.style.borderColor='var(--acc)'"
                 onblur="this.style.borderColor='var(--border2)'">
               <button onclick="toggleClaudeVis()" id="claude-vis-btn"
@@ -309,6 +333,7 @@ textarea.inp{min-height:130px;resize:vertical;line-height:1.75;}
             </div>
             <div style="font-size:10px;color:var(--t3);margin-top:4px;">console.anthropic.com/keys</div>
           </div>
+        </div>
           <div>
             <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Kling API Key + Worker URL (Video Gen)</div>
             <div style="display:flex;align-items:center;gap:6px;">
@@ -661,11 +686,54 @@ function clearRefImg(){
   document.getElementById('ref-clear').style.display='none';
 }
 
-// ─── API KEYS (in-memory, no localStorage) ────────────────────
-let _claudeKey='', _klingKey='', _workerUrl='';
+// ─── AI MODEL STATE ────────────────────────────────────────────
+let _aiModel = 'gemini'; // 'gemini' | 'claude'
 
-function getClaudeKey(){
+function setAIModel(model){
+  _aiModel = model;
+  const gb = document.getElementById('ai-btn-gemini');
+  const cb = document.getElementById('ai-btn-claude');
+  const gw = document.getElementById('gemini-key-wrap');
+  const cw = document.getElementById('claude-key-wrap');
+  if(model === 'gemini'){
+    gb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(75,158,255,.5);background:rgba(75,158,255,.15);color:var(--blue);cursor:pointer;font-family:"DM Sans",sans-serif;';
+    cb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:"DM Sans",sans-serif;';
+    if(gw) gw.style.display='block';
+    if(cw) cw.style.display='none';
+  } else {
+    cb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1.5px solid rgba(33,217,122,.4);background:rgba(33,217,122,.1);color:var(--acc);cursor:pointer;font-family:"DM Sans",sans-serif;';
+    gb.style.cssText='flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:"DM Sans",sans-serif;';
+    if(cw) cw.style.display='block';
+    if(gw) gw.style.display='none';
+  }
+  checkAIKey();
+}
+
+function getAIKey(){
+  if(_aiModel === 'gemini') return document.getElementById('gemini-key-inp')?.value?.trim() || _claudeKey;
   return document.getElementById('claude-key-inp')?.value?.trim() || _claudeKey;
+}
+
+function checkAIKey(){
+  const k = getAIKey();
+  const ok = k.length > 10;
+  const dot = document.getElementById('ai-dot') || document.getElementById('claude-dot');
+  if(dot) dot.style.background = ok ? '#21d97a' : 'var(--t3)';
+  const status = document.getElementById('keys-status');
+  if(status){
+    status.textContent = ok
+      ? `✓ ${_aiModel==='gemini'?'Gemini Flash':'Claude Sonnet'} พร้อม — เลือก template แล้วกด วิเคราะห์ได้เลย`
+      : `ใส่ ${_aiModel==='gemini'?'Gemini':'Claude'} API Key เพื่อเริ่มสร้าง scenes`;
+    status.style.color = ok ? 'var(--acc)' : 'var(--t3)';
+  }
+}
+
+function toggleGeminiVis(){
+  const inp = document.getElementById('gemini-key-inp');
+  const btn = document.getElementById('gemini-vis-btn');
+  if(!inp) return;
+  inp.type = inp.type==='password' ? 'text' : 'password';
+  if(btn) btn.textContent = inp.type==='password' ? 'show' : 'hide';
 }
 function getKlingKey(){
   const inp=document.getElementById('kling-key-inp')||document.getElementById('kling-key-top');
@@ -720,6 +788,27 @@ function toggleKlingVis(){
   if(!inp) return;
   inp.type=inp.type==='password'?'text':'password';
   if(btn) btn.textContent=inp.type==='password'?'show':'hide';
+}
+
+// ─── GEMINI FLASH API CALL ─────────────────────────────────────
+async function callGemini(systemPrompt, userMsg){
+  const key = document.getElementById('gemini-key-inp')?.value?.trim();
+  if(!key) throw new Error('กรุณาใส่ Gemini API Key — รับฟรีที่ aistudio.google.com/apikey');
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      system_instruction:{parts:[{text:systemPrompt}]},
+      contents:[{role:'user',parts:[{text:userMsg}]}],
+      generationConfig:{temperature:0.7,maxOutputTokens:4000}
+    })
+  });
+  if(!res.ok){
+    const e=await res.json().catch(()=>({}));
+    throw new Error(e.error?.message||`Gemini HTTP ${res.status}`);
+  }
+  const data=await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
 }
 
 // ─── ANALYZE ───────────────────────────────────────────────────
@@ -786,32 +875,38 @@ Additional rules:
       : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
 
   try{
-    const claudeKey = getClaudeKey();
-    const headers = {
-      'Content-Type':'application/json',
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    };
-    if(claudeKey) headers['x-api-key'] = claudeKey;
+    let rawText = '';
 
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers,
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:userContent}]})
-    });
-    if(!res.ok){
-      const e=await res.json().catch(()=>({}));
-      throw new Error(e.error?.message||`HTTP ${res.status} — ตรวจสอบ API key หรือ network`);
+    if(_aiModel === 'gemini'){
+      // ── Gemini Flash (ฟรี) ──
+      const userMsg = inputMode==='youtube'
+        ? `Create a 30-second viral video breakdown (3 scenes × 10s) for this YouTube video: ${input}`
+        : `Create a 30-second viral video breakdown (3 scenes × 10s) in ${style} style:\n\n${input}`;
+      rawText = await callGemini(sys, userMsg);
+    } else {
+      // ── Claude Sonnet ──
+      const claudeKey = document.getElementById('claude-key-inp')?.value?.trim() || _claudeKey;
+      const headers = {
+        'Content-Type':'application/json',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      };
+      if(claudeKey) headers['x-api-key'] = claudeKey;
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers,
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content:userContent}]})
+      });
+      if(!res.ok){
+        const e=await res.json().catch(()=>({}));
+        throw new Error(e.error?.message||`HTTP ${res.status}`);
+      }
+      const data=await res.json();
+      rawText = data.content.filter(b=>b.type==='text').map(b=>b.text||'').join('').trim();
     }
-    const data=await res.json();
-    clearInterval(iv);
 
-    // extract text from all content blocks
-    const raw = data.content
-      .filter(b=>b.type==='text')
-      .map(b=>b.text||'')
-      .join('')
-      .trim();
+    clearInterval(iv);
+    const raw = rawText.trim();
 
     if(!raw) throw new Error('Claude ตอบกลับมาว่าง — ลองใหม่อีกครั้ง');
 
